@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:usea_staff_test/provider/calendar_provider.dart';
 import 'package:usea_staff_test/provider/permission_provider.dart';
 import 'auth/gate/authGate.dart';
 import 'provider/attendance_provider.dart';
@@ -12,6 +13,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => TaskProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
         ChangeNotifierProvider(create: (_) => PermissionProvider()),
+        ChangeNotifierProvider(create: (_) => CalendarProvider()),
       ],
       child: MyApp(),
     ),

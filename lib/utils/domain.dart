@@ -15,6 +15,8 @@ class ApiEndpoints {
   static String get loginUserData => '${_baseUrl}login';
   static String get getUsers => '${_baseUrl}users';
   static String get getAttendances => '${_baseUrl}attendances/';
+  static String get getCalendars => '${_baseUrl}schedules/';
   static String get getPermissions => '${_baseUrl}permissions/';
   static String get getMembers => '${_baseUrl}members';
+  static String get getHolidays => '${_baseUrl}holidays';
 }
