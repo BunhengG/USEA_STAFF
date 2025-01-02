@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:usea_staff_test/constant/constant.dart';
 import 'package:usea_staff_test/provider/permission_provider.dart';
@@ -57,11 +58,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       permissionProvider.errorMessage!,
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: getSubTitle().copyWith(color: uAtvColor),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -99,29 +96,87 @@ class _PermissionScreenState extends State<PermissionScreen> {
                     itemBuilder: (context, index) {
                       final permission = permissionProvider.permissions[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
                         child: Card(
                           color: secondaryColor,
                           elevation: 2,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius:
+                                BorderRadius.circular(roundedCornerSM),
                           ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(16.0),
-                            leading: const Icon(
-                              Icons.access_alarm,
-                              color: Colors.blueAccent,
-                            ),
-                            title: Text(
-                              '${permission.username} - ${permission.reason}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${permission.date.toLocal().toString().split(' ')[0]} - PMD ${permission.permissionDay}',
-                              style: const TextStyle(fontSize: 16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(mdPadding),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'PD ${permission.permissionDay}',
+                                      style: getTitle(),
+                                    ),
+
+                                    //* Vertical Divider
+                                    Container(
+                                      height: 50,
+                                      width: 3,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(
+                                            roundedCornerSM),
+                                      ),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 16.0,
+                                      ),
+                                    ),
+
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Permission Details',
+                                          style: getSubTitle(),
+                                        ),
+                                        const SizedBox(height: smPadding),
+                                        Row(
+                                          children: [
+                                            const FaIcon(
+                                              FontAwesomeIcons.thumbtack,
+                                              size: 16,
+                                              color: uAtvShape,
+                                            ),
+                                            const SizedBox(width: smPadding),
+                                            Text(
+                                              permission.reason,
+                                              style: getBody(),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: smPadding),
+                                        Row(
+                                          children: [
+                                            const FaIcon(
+                                              FontAwesomeIcons.calendar,
+                                              size: 16,
+                                              color: uAtvShape,
+                                            ),
+                                            const SizedBox(width: smPadding),
+                                            Text(
+                                              permission.date
+                                                  .toLocal()
+                                                  .toString()
+                                                  .split(' ')[0],
+                                              style: getBody(),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -130,7 +185,6 @@ class _PermissionScreenState extends State<PermissionScreen> {
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                   ),
-                  const SizedBox(height: defaultPadding),
                 ],
               );
             }),

@@ -123,6 +123,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     }
 
     return ListView.separated(
+      shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
       itemCount: calendars.length,
       itemBuilder: (context, index) {
@@ -130,28 +131,79 @@ class _CalendarScreenState extends State<CalendarScreen>
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: smPadding),
           child: Card(
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: smMargin),
             color: secondaryColor,
             elevation: 2,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(roundedCornerMD),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(mdPadding),
-              leading: const Icon(
-                Icons.calendar_today,
-                color: primaryColor,
-              ),
-              title: Text(calendar.username, style: getSubTitle()),
-              subtitle: Text(
-                '${calendar.date.toLocal().toString().split(' ')[0]} - ${calendar.attendStatus}',
-                style: getBody(),
-              ),
-              trailing: Icon(
-                calendar.attendStatus == 'Present'
-                    ? Icons.check_circle
-                    : Icons.cancel,
-                color: calendar.attendStatus == 'Present' ? atvColor : anvColor,
+            child: Padding(
+              padding: const EdgeInsets.all(mdPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        calendar.date.toLocal().toString().split(' ')[0],
+                        style: getBody(),
+                      ),
+
+                      //* Vertical Divider
+                      Container(
+                        height: 50,
+                        width: 3,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(roundedCornerSM),
+                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      ),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text('Workday', style: getSubTitle()),
+                              Text(' / ', style: getSubTitle()),
+                              Text('Time', style: getSubTitle()),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                calendar.date
+                                    .toLocal()
+                                    .toString()
+                                    .split(' ')[0],
+                                style: getBody().copyWith(color: primaryColor),
+                              ),
+                              const SizedBox(width: mdPadding),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${calendar.morningTime} AM',
+                                    style: getBody(),
+                                  ),
+                                  Text(
+                                    '${calendar.afternoonTime} PM',
+                                    style: getBody(),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
           ),
@@ -168,40 +220,45 @@ class _CalendarScreenState extends State<CalendarScreen>
     }
 
     return ListView.separated(
+      shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
       itemCount: holidays.length,
       itemBuilder: (context, index) {
         final holiday = holidays[index];
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: smPadding),
           child: Card(
-            color: Colors.white,
+            color: secondaryColor,
             elevation: 2,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(roundedCornerMD),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.all(16.0),
-              leading: const Icon(
-                Icons.beach_access,
-                color: Colors.orange,
-              ),
+              contentPadding: const EdgeInsets.all(mdPadding),
+              leading:
+                  const Text('🎉', style: TextStyle(fontSize: titleSize + 4)),
               title: Text(
-                holiday['name'] ?? 'Unnamed Holiday',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                holiday['date'] ?? 'Unnamed Date',
+                style: getTitle(),
               ),
-              subtitle: Text(
-                '${holiday['date'] ?? 'Unknown Date'}',
-                style: const TextStyle(fontSize: 16),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${holiday['name'] ?? 'Unknown Holiday'}',
+                    style: getSubTitle(),
+                  ),
+                  Text(
+                    '${holiday['description'] ?? 'Unknown Description'}',
+                    style: getBody(),
+                  ),
+                ],
               ),
             ),
           ),
         );
       },
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      separatorBuilder: (context, index) => const SizedBox(height: smPadding),
     );
   }
 

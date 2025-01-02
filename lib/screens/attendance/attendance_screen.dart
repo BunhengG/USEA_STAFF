@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:usea_staff_test/constant/constant.dart';
 import '../../Components/custom_appbar_widget.dart';
 import '../../provider/attendance_provider.dart';
 
@@ -21,6 +22,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: CustomAppBar(title: 'Attendance'),
       body: Consumer<AttendanceProvider>(
         builder: (context, attendanceProvider, child) {
@@ -38,11 +40,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   attendanceProvider.errorMessage!,
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: getSubTitle().copyWith(color: uAtvColor),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -51,12 +49,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
           // Show no records found if the list is empty
           if (attendanceProvider.attendances.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
                   'No attendance records found.',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: getSubTitle(),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -65,41 +63,84 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
           // Display attendance list
           return ListView.separated(
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
             itemCount: attendanceProvider.attendances.length,
             itemBuilder: (context, index) {
               final attendance = attendanceProvider.attendances[index];
               return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: mdPadding),
                 child: Card(
-                  elevation: 5,
+                  color: secondaryColor,
+                  elevation: 2,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(roundedCornerSM),
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16.0),
-                    leading: const Icon(
-                      Icons.access_alarm,
-                      color: Colors.blueAccent,
-                    ),
-                    title: Text(
-                      attendance.username,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${attendance.date.toLocal().toString().split(' ')[0]} - ${attendance.attendStatus}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    trailing: Icon(
-                      attendance.attendStatus == 'Present'
-                          ? Icons.check_circle
-                          : Icons.cancel,
-                      color: attendance.attendStatus == 'Present'
-                          ? Colors.green
-                          : Colors.red,
+                  child: Padding(
+                    padding: const EdgeInsets.all(mdPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              attendance.attendStatus == 'A1' ? 'A1' : 'A2',
+                              style: attendance.attendStatus == 'A1'
+                                  ? getTitle()
+                                  : getTitle().copyWith(color: uAtvColor),
+                            ),
+
+                            //* Vertical Divider
+                            Container(
+                              height: 50,
+                              width: 3,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius:
+                                    BorderRadius.circular(roundedCornerSM),
+                              ),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                            ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //* Title Section
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Check In / Out',
+                                      style: getSubTitle().copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(width: mdPadding),
+                                    Text(
+                                      attendance.date
+                                          .toLocal()
+                                          .toString()
+                                          .split(' ')[0],
+                                      style: getBody()
+                                          .copyWith(color: primaryColor),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: mdPadding),
+                                Text(
+                                  '🔵 ${attendance.morningTime} AM',
+                                  style: getBody(),
+                                ),
+                                Text(
+                                  '🔵 ${attendance.afternoonTime} PM',
+                                  style: getBody(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
