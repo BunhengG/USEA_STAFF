@@ -18,6 +18,7 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
   Barcode? result;
   bool _isFlashOn = false;
   bool _isProcessing = false;
+  bool _isLoading = false;
 
   @override
   void reassemble() {
@@ -40,6 +41,10 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
           children: [
             _buildQRScanner(),
             _buildCustomBorders(cutOutSize),
+            if (_isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
           ],
         ),
       ),
@@ -180,13 +185,15 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
-      if (_isProcessing) return; // Avoid multiple calls
+      // if (_isProcessing) return;
+      if (_isProcessing || _isLoading) return;
 
       if (scanData.code != null) {
         if (mounted) {
           setState(() {
             result = scanData;
             _isProcessing = true;
+            _isLoading = true;
           });
           await _loginWithQRCode();
         }
@@ -210,9 +217,12 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
     final password = data[1];
 
     try {
+      setState(() => _isLoading = true);
+
       final userDataResponse = await loginUser(userId, password);
       if (userDataResponse != null) {
         await SharedPrefHelper.saveUserIdAndPassword(userId, password);
+        await Future.delayed(const Duration(seconds: 2));
         _navigateToHomePage();
       } else {
         _showSnackbar('Invalid userId or password.');
@@ -221,6 +231,7 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
       _showSnackbar('An error occurred: $e');
     } finally {
       if (mounted) {
+        setState(() => _isLoading = false);
         setState(() => _isProcessing = false);
       }
     }
