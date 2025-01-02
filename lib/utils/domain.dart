@@ -13,14 +13,8 @@ class ApiEndpoints {
 
   // API Endpoints with dynamic base URL based on language code
   static String get loginUserData => '${_baseUrl}login';
-
-  // static String get creditData => '${_baseUrl}action=study_credit';
-  // static String get scheduleData => '${_baseUrl}action=study_schedule';
-  // static String get performanceData => '${_baseUrl}action=study_performance';
-  // static String get attendanceData => '${_baseUrl}action=attendance_data';
-  // static String get paymentData => '${_baseUrl}action=payment';
-  // static String get paymentOtherData => '${_baseUrl}action=other_payment';
-  // static String get jobHistoryData => '${_baseUrl}action=login_student';
-  // static String get studyInfoData => '${_baseUrl}action=exam_schedule';
-  // static String get feedbackData => '${_baseUrl}action=feedback';
+  static String get getUsers => '${_baseUrl}users';
+  static String get getAttendances => '${_baseUrl}attendances/';
+  static String get getPermissions => '${_baseUrl}permissions/';
+  static String get getMembers => '${_baseUrl}members';
 }
