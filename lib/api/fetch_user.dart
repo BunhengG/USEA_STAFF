@@ -26,7 +26,8 @@ Future<UserItem?> loginUser(String userId, String password) async {
       if (responseBody.isNotEmpty) {
         var jsonData = jsonDecode(responseBody);
 
-        if (jsonData != null) {
+        // Check if jsonData is not null before trying to parse
+        if (jsonData != null && jsonData is Map<String, dynamic>) {
           return UserItem.fromJson(jsonData);
         } else {
           print('Error: Response body is null or invalid');

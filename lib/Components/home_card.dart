@@ -26,11 +26,13 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
       child: Consumer<CardProvider>(
         builder: (context, workPeriodProvider, child) {
           // Show loading indicator
-          // if (workPeriodProvider.isLoading) {
-          //   return const Center(
-          //     child: CircularProgressIndicator(),
-          //   );
-          // }
+          if (workPeriodProvider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(backgroundColor),
+              ),
+            );
+          }
           // Show error message if any
           if (workPeriodProvider.errorMessage != null) {
             return Center(

@@ -39,9 +39,9 @@ class UserItem {
       gender: json['gender'] ?? 'No Gender',
       dob: json['dob'] != null ? DateTime.tryParse(json['dob']) : null,
       position: json['position'] ?? 'No Position',
-      joinAt: json['joinAt'],
-      endProbation: json['endProbation'],
-      workAnniversary: json['workAnniversary'],
+      joinAt: json['joinAt'] ?? '',
+      endProbation: json['endProbation'] ?? '',
+      workAnniversary: json['workAnniversary'] ?? '',
     );
   }
 
