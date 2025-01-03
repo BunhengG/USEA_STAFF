@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:usea_staff_test/constant/constant.dart';
@@ -102,55 +103,59 @@ class _CardScreenState extends State<CardScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: mdPadding,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 34,
-                                          backgroundColor: primaryColor,
-                                          child: Image.asset(
-                                            'assets/img/avator.png',
-                                            scale: 8,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 32,
+                                        backgroundColor: primaryColor,
+                                        child: CachedNetworkImage(
+                                          imageUrl: card.image,
+                                          placeholder: (context, url) =>
+                                              const CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
                                           ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                          fit: BoxFit.cover,
+                                          scale: 9,
                                         ),
-                                        const SizedBox(height: smPadding),
-                                        Image.asset(
-                                          'assets/img/dara.png',
-                                          scale: 14,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(width: defaultMargin * 2),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildTextDetails('Name : ', card.name),
-                                        _buildTextDetails(
-                                            'UserId : ', card.userId),
-                                        _buildTextDetails(
-                                            'Gender : ', card.gender),
-                                        _buildTextDetails(
-                                          'DOB : ',
-                                          card.dob!
-                                              .toLocal()
-                                              .toString()
-                                              .split(' ')[0],
-                                        ),
-                                        _buildTextDetails(
-                                            'Position : ', card.position),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                      ),
+                                      const SizedBox(height: smPadding),
+                                      Image.asset(
+                                        'assets/img/dara.png',
+                                        scale: 14,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: defaultMargin),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildTextDetails('Name : ', card.name),
+                                      _buildTextDetails(
+                                          'UserId : ', card.userId),
+                                      _buildTextDetails(
+                                          'Gender : ', card.gender),
+                                      _buildTextDetails(
+                                        'DOB : ',
+                                        card.dob!
+                                            .toLocal()
+                                            .toString()
+                                            .split(' ')[0],
+                                      ),
+                                      _buildTextDetails(
+                                          'Position : ', card.position),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ],
                           ),

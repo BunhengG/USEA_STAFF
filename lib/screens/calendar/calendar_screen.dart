@@ -133,7 +133,7 @@ class _CalendarScreenState extends State<CalendarScreen>
           child: Card(
             margin: const EdgeInsets.only(top: smMargin),
             color: secondaryColor,
-            elevation: 2,
+            elevation: 1,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(roundedCornerMD),
             ),
@@ -146,8 +146,10 @@ class _CalendarScreenState extends State<CalendarScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        calendar.date.toLocal().toString().split(' ')[0],
-                        style: getBody(),
+                        calendar.day.length > 3
+                            ? calendar.day.substring(0, 3)
+                            : calendar.day,
+                        style: getTitle(),
                       ),
 
                       //* Vertical Divider
@@ -158,7 +160,8 @@ class _CalendarScreenState extends State<CalendarScreen>
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(roundedCornerSM),
                         ),
-                        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                        margin:
+                            const EdgeInsets.symmetric(horizontal: mdPadding),
                       ),
 
                       Column(
@@ -209,7 +212,7 @@ class _CalendarScreenState extends State<CalendarScreen>
           ),
         );
       },
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: mdPadding),
     );
   }
 

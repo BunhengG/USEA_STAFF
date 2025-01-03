@@ -29,7 +29,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    double rowHeight = screenHeight * 0.07;
+    double rowHeight = screenHeight * 0.06;
     double daySize = screenWidth * 0.12;
 
     return Consumer<CalendarProvider>(

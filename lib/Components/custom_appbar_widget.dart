@@ -12,7 +12,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor = Colors.transparent,
     TextStyle? subtitle,
     this.iconPath = 'assets/icon/back.png',
-  }) : this.subtitle = subtitle ?? getTitle().copyWith(color: textColor);
+  }) : this.subtitle = subtitle ?? getSubTitle();
 
   @override
   Widget build(BuildContext context) {

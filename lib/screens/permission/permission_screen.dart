@@ -89,101 +89,105 @@ class _PermissionScreenState extends State<PermissionScreen> {
                   ),
 
                   // Display the list of permissions
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: permissionProvider.permissions.length,
-                    itemBuilder: (context, index) {
-                      final permission = permissionProvider.permissions[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: Card(
-                          color: secondaryColor,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(roundedCornerSM),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(mdPadding),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'PD ${permission.permissionDay}',
-                                      style: getTitle(),
-                                    ),
-
-                                    //* Vertical Divider
-                                    Container(
-                                      height: 50,
-                                      width: 3,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(
-                                            roundedCornerSM),
+                  Container(
+                    color: backgroundColor,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: permissionProvider.permissions.length,
+                      itemBuilder: (context, index) {
+                        final permission =
+                            permissionProvider.permissions[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                          child: Card(
+                            color: secondaryColor,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(roundedCornerSM),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(mdPadding),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'PD ${permission.permissionDay}',
+                                        style: getTitle(),
                                       ),
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 16.0,
-                                      ),
-                                    ),
 
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Permission Details',
-                                          style: getSubTitle(),
+                                      //* Vertical Divider
+                                      Container(
+                                        height: 50,
+                                        width: 3,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius: BorderRadius.circular(
+                                              roundedCornerSM),
                                         ),
-                                        const SizedBox(height: smPadding),
-                                        Row(
-                                          children: [
-                                            const FaIcon(
-                                              FontAwesomeIcons.thumbtack,
-                                              size: 16,
-                                              color: uAtvShape,
-                                            ),
-                                            const SizedBox(width: smPadding),
-                                            Text(
-                                              permission.reason,
-                                              style: getBody(),
-                                            ),
-                                          ],
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 16.0,
                                         ),
-                                        const SizedBox(height: smPadding),
-                                        Row(
-                                          children: [
-                                            const FaIcon(
-                                              FontAwesomeIcons.calendar,
-                                              size: 16,
-                                              color: uAtvShape,
-                                            ),
-                                            const SizedBox(width: smPadding),
-                                            Text(
-                                              permission.date
-                                                  .toLocal()
-                                                  .toString()
-                                                  .split(' ')[0],
-                                              style: getBody(),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      ),
+
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Permission Details',
+                                            style: getSubTitle(),
+                                          ),
+                                          const SizedBox(height: smPadding),
+                                          Row(
+                                            children: [
+                                              const FaIcon(
+                                                FontAwesomeIcons.thumbtack,
+                                                size: 16,
+                                                color: uAtvShape,
+                                              ),
+                                              const SizedBox(width: smPadding),
+                                              Text(
+                                                permission.reason,
+                                                style: getBody(),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: smPadding),
+                                          Row(
+                                            children: [
+                                              const FaIcon(
+                                                FontAwesomeIcons.calendar,
+                                                size: 16,
+                                                color: uAtvShape,
+                                              ),
+                                              const SizedBox(width: smPadding),
+                                              Text(
+                                                permission.date
+                                                    .toLocal()
+                                                    .toString()
+                                                    .split(' ')[0],
+                                                style: getBody(),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
+                        );
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                    ),
                   ),
                 ],
               );
