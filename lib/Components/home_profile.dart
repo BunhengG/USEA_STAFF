@@ -28,11 +28,13 @@ class _ProfileState extends State<Profile> {
       child: Consumer<CardProvider>(
         builder: (context, profileProvider, child) {
           // Show loading indicator
-          // if (profileProvider.isLoading) {
-          //   return const Center(
-          //     child: CircularProgressIndicator(),
-          //   );
-          // }
+          if (profileProvider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(backgroundColor),
+              ),
+            );
+          }
           // Show error message if any
           if (profileProvider.errorMessage != null) {
             return Center(
