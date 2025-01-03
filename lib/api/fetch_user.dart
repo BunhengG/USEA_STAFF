@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../model/user.dart';
 import '../utils/domain.dart';
 
+/// Logs in the user and returns a [UserItem] on success.
 Future<UserItem?> loginUser(String userId, String password) async {
   final String apiUrl = ApiEndpoints.loginUserData;
 
@@ -26,7 +27,7 @@ Future<UserItem?> loginUser(String userId, String password) async {
         var jsonData = jsonDecode(responseBody);
 
         if (jsonData != null) {
-          return UserItem.fromMap(jsonData);
+          return UserItem.fromJson(jsonData);
         } else {
           print('Error: Response body is null or invalid');
         }

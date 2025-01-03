@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:usea_staff_test/provider/calendar_provider.dart';
 import 'package:usea_staff_test/provider/memeber_provider.dart';
+import 'package:usea_staff_test/provider/mycard_provider.dart';
 import 'package:usea_staff_test/provider/permission_provider.dart';
 import 'auth/gate/authGate.dart';
 import 'provider/attendance_provider.dart';
@@ -16,6 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => PermissionProvider()),
         ChangeNotifierProvider(create: (_) => CalendarProvider()),
         ChangeNotifierProvider(create: (_) => MemberProvider()),
+        ChangeNotifierProvider(create: (_) => CardProvider()),
       ],
       child: MyApp(),
     ),

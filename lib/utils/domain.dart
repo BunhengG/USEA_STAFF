@@ -14,6 +14,7 @@ class ApiEndpoints {
   // API Endpoints with dynamic base URL based on language code
   static String get loginUserData => '${_baseUrl}login';
   static String get getUsers => '${_baseUrl}users';
+  static String get getUsersByID => '${_baseUrl}users/';
   static String get getAttendances => '${_baseUrl}attendances/';
   static String get getCalendars => '${_baseUrl}schedules/';
   static String get getPermissions => '${_baseUrl}permissions/';
