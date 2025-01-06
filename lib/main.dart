@@ -6,6 +6,8 @@ import 'package:usea_staff_test/provider/mycard_provider.dart';
 import 'package:usea_staff_test/provider/permission_provider.dart';
 import 'auth/gate/authGate.dart';
 import 'provider/attendance_provider.dart';
+import 'provider/check_in_out_provider.dart';
+import 'provider/record_provider.dart';
 import 'provider/task_provider.dart';
 
 void main() {
@@ -18,6 +20,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => CalendarProvider()),
         ChangeNotifierProvider(create: (_) => MemberProvider()),
         ChangeNotifierProvider(create: (_) => CardProvider()),
+        ChangeNotifierProvider(create: (_) => CheckInOutProvider()),
+        ChangeNotifierProvider(create: (_) => ShiftDetailsProvider()),
       ],
       child: MyApp(),
     ),

@@ -129,11 +129,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                 ),
                                 const SizedBox(height: mdPadding),
                                 Text(
-                                  '🔵 ${attendance.morningTime} AM',
+                                  '🔵 ${attendance.firstShiftCheckIn} AM',
                                   style: getBody(),
                                 ),
                                 Text(
-                                  '🔵 ${attendance.afternoonTime} PM',
+                                  '🔵 ${attendance.firstShiftCheckOut} PM',
                                   style: getBody(),
                                 ),
                               ],

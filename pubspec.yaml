@@ -55,6 +55,8 @@ dependencies:
   table_calendar: ^3.1.2
   intl:
   cached_network_image:
+  geolocator:
+  timezone:
 
 dev_dependencies:
   flutter_test:

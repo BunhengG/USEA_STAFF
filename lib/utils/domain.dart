@@ -20,4 +20,7 @@ class ApiEndpoints {
   static String get getPermissions => '${_baseUrl}permissions/';
   static String get getMembers => '${_baseUrl}members';
   static String get getHolidays => '${_baseUrl}holidays';
+  static String get getShifts => '${_baseUrl}getShiftData/';
+  static String get getSingleShifts => '${_baseUrl}getSingleShiftData/';
+  static String get getCheckInOut => '${_baseUrl}check-in-out';
 }

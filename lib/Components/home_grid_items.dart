@@ -5,8 +5,8 @@ import 'package:usea_staff_test/screens/card/card_screen.dart';
 import 'package:usea_staff_test/screens/home_screen.dart';
 import 'package:usea_staff_test/screens/member/member_screen.dart';
 import 'package:usea_staff_test/screens/permission/permission_screen.dart';
-import 'package:usea_staff_test/screens/scan_qr/scanQr_screen.dart';
 import '../constant/constant.dart';
+import '../screens/scan_qr/CheckIn_out.dart';
 
 class MenuGrid extends StatelessWidget {
   final List<Map<String, dynamic>> menuItems = [
@@ -57,7 +57,7 @@ class MenuGrid extends StatelessWidget {
       case '/card':
         return const CardScreen();
       case '/scan_qr':
-        return const ScanQrScreen();
+        return const CheckInAndOutRecord();
       default:
         return const HomeScreen();
     }

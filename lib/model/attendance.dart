@@ -3,8 +3,10 @@ class AttendanceItem {
   final String userId;
   final String username;
   final DateTime date;
-  final String morningTime;
-  final String afternoonTime;
+  final DateTime? firstShiftCheckIn;
+  final DateTime? firstShiftCheckOut;
+  final DateTime? secondShiftCheckIn;
+  final DateTime? secondShiftCheckOut;
   final String attendStatus;
 
   AttendanceItem({
@@ -12,8 +14,10 @@ class AttendanceItem {
     required this.userId,
     required this.username,
     required this.date,
-    required this.morningTime,
-    required this.afternoonTime,
+    this.firstShiftCheckIn,
+    this.firstShiftCheckOut,
+    this.secondShiftCheckIn,
+    this.secondShiftCheckOut,
     required this.attendStatus,
   });
 
@@ -23,8 +27,18 @@ class AttendanceItem {
       userId: json['userId'],
       username: json['username'],
       date: DateTime.parse(json['date']),
-      morningTime: json['morningTime'],
-      afternoonTime: json['afternoonTime'],
+      firstShiftCheckIn: json['firstShiftCheckIn'] != null
+          ? DateTime.parse(json['firstShiftCheckIn'])
+          : null,
+      firstShiftCheckOut: json['firstShiftCheckOut'] != null
+          ? DateTime.parse(json['firstShiftCheckOut'])
+          : null,
+      secondShiftCheckIn: json['secondShiftCheckIn'] != null
+          ? DateTime.parse(json['secondShiftCheckIn'])
+          : null,
+      secondShiftCheckOut: json['secondShiftCheckOut'] != null
+          ? DateTime.parse(json['secondShiftCheckOut'])
+          : null,
       attendStatus: json['attendStatus'],
     );
   }
@@ -35,8 +49,10 @@ class AttendanceItem {
       'userId': userId,
       'username': username,
       'date': date.toIso8601String(),
-      'morningTime': morningTime,
-      'afternoonTime': afternoonTime,
+      'firstShiftCheckIn': firstShiftCheckIn?.toIso8601String(),
+      'firstShiftCheckOut': firstShiftCheckOut?.toIso8601String(),
+      'secondShiftCheckIn': secondShiftCheckIn?.toIso8601String(),
+      'secondShiftCheckOut': secondShiftCheckOut?.toIso8601String(),
       'attendStatus': attendStatus,
     };
   }
