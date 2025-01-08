@@ -44,7 +44,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
         padding: const EdgeInsets.all(defaultPadding),
         child:
             Consumer<CheckInOutProvider>(builder: (context, provider, child) {
-          print('Status: >> ${provider.shiftStatus}');
+          // print('Status: >> ${provider.shiftStatus}');
 
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -106,34 +106,35 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
               Container(
                 padding: const EdgeInsets.all(mdPadding),
                 decoration: BoxDecoration(
+                  boxShadow: const [shadowLg],
                   color: secondaryColor,
                   borderRadius: BorderRadius.circular(roundedCornerSM),
                 ),
                 child: Stack(
                   children: [
                     const ShiftDetailsWidget(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: defaultPadding),
                     if (provider.shiftStatus != 'disabled')
                       Positioned(
-                        top: smMargin,
-                        right: smMargin,
+                        top: smMargin - 6,
+                        right: smMargin - 6,
                         child: GestureDetector(
                           onTap: onTap,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: smMargin,
-                              vertical: smPadding,
+                              horizontal: mdMargin + 4,
+                              vertical: mdPadding,
                             ),
                             decoration: BoxDecoration(
+                              border: Border.all(color: Colors.green, width: 2),
                               color: buttonColor,
                               borderRadius:
-                                  BorderRadius.circular(roundedCornerSM),
+                                  BorderRadius.circular(roundedCornerSM - 2),
                             ),
                             child: Text(buttonText, style: getWhiteSubTitle()),
                           ),
                         ),
                       ),
-                    const SizedBox(height: 10),
                   ],
                 ),
               ),

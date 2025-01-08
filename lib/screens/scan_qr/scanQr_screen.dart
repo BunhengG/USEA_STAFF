@@ -49,30 +49,50 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
   Widget build(BuildContext context) {
     final double cutOutSize = MediaQuery.of(context).size.width * 0.7;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('QR Code Check-In/Out'),
-          backgroundColor: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'SCAN QR',
+          style: getWhiteSubTitle(),
         ),
-        body: Consumer<CheckInOutProvider>(
-          builder: (context, provider, child) {
-            return Stack(
-              children: [
-                _buildQRScanner(),
-                _buildCustomBorders(cutOutSize),
-                if (provider.isLoading)
-                  const Center(
-                      child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  )),
-              ],
-            );
-          },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: IconButton(
+            icon: Image.asset(
+              'assets/icon/custom_icon.png',
+              scale: 12,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Consumer<CheckInOutProvider>(
+        builder: (context, provider, child) {
+          return Stack(
+            children: [
+              _buildQRScanner(),
+              _buildCustomBorders(cutOutSize),
+              if (provider.isLoading)
+                const Center(
+                    child: CircularProgressIndicator(
+                  color: secondaryColor,
+                )),
+            ],
+          );
+        },
       ),
     );
   }
+
+  // ===========================
+  // NOTE: UI COMPONENTS
+  // ===========================
 
   Widget _buildQRScanner() {
     return Column(
@@ -83,12 +103,13 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
             onQRViewCreated: _onQRViewCreated,
             overlay: QrScannerOverlayShape(
               overlayColor: Colors.transparent,
-              borderColor: secondaryColor,
-              borderRadius: 20,
+              borderColor: Colors.transparent,
+              borderRadius: roundedCornerSM,
               borderLength: 32,
               borderWidth: 6,
-              cutOutSize: MediaQuery.of(context).size.width * 0.6,
+              cutOutSize: MediaQuery.of(context).size.width * 0.7,
             ),
+            onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
           ),
         ),
         _buildFlashButton(),
@@ -97,16 +118,24 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
   }
 
   Widget _buildFlashButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+    return Container(
+      color: Colors.transparent,
+      margin: const EdgeInsets.only(bottom: mdMargin),
+      padding: const EdgeInsets.only(
+        bottom: defaultPadding * 1.6,
+        top: mdPadding,
+      ),
       child: InkWell(
         onTap: _toggleFlash,
         child: Container(
-          width: 150,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          width: 120,
+          padding: const EdgeInsets.symmetric(
+            horizontal: defaultPadding,
+            vertical: defaultPadding - 2,
+          ),
           decoration: BoxDecoration(
-            color: _isFlashOn ? Colors.grey : Colors.grey[800],
-            borderRadius: BorderRadius.circular(20),
+            color: _isFlashOn ? primaryColor : Colors.blue[300],
+            borderRadius: BorderRadius.circular(roundedCornerSM),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -115,12 +144,12 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
                 _isFlashOn
                     ? Icons.flashlight_on_rounded
                     : Icons.flashlight_off_rounded,
-                color: Colors.white,
+                color: secondaryColor,
               ),
               const SizedBox(width: 4),
-              const Text(
+              Text(
                 'Flash',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+                style: getWhiteSubTitle(),
               ),
             ],
           ),
@@ -136,16 +165,66 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
       child: SizedBox(
         width: cutOutSize,
         height: cutOutSize,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: secondaryColor, width: 6),
-            borderRadius: BorderRadius.circular(20),
-          ),
+        child: Stack(
+          children: List.generate(4, (index) => _buildCornerBorder(index)),
         ),
       ),
     );
   }
 
+  Widget _buildCornerBorder(int index) {
+    const borderSide = BorderSide(width: 4, color: secondaryColor);
+    BorderRadius borderRadius;
+    Alignment alignment;
+
+    switch (index) {
+      case 0:
+        borderRadius =
+            const BorderRadius.only(topLeft: Radius.circular(roundedCornerLG));
+        alignment = Alignment.topLeft;
+        break;
+      case 1:
+        borderRadius =
+            const BorderRadius.only(topRight: Radius.circular(roundedCornerLG));
+        alignment = Alignment.topRight;
+        break;
+      case 2:
+        borderRadius = const BorderRadius.only(
+            bottomLeft: Radius.circular(roundedCornerLG));
+        alignment = Alignment.bottomLeft;
+        break;
+      case 3:
+      default:
+        borderRadius = const BorderRadius.only(
+            bottomRight: Radius.circular(roundedCornerLG));
+        alignment = Alignment.bottomRight;
+        break;
+    }
+
+    return Positioned(
+      top: alignment.y < 0 ? 0 : null,
+      bottom: alignment.y > 0 ? 0 : null,
+      left: alignment.x < 0 ? 0 : null,
+      right: alignment.x > 0 ? 0 : null,
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          border: Border(
+            top: alignment.y < 0 ? borderSide : BorderSide.none,
+            bottom: alignment.y > 0 ? borderSide : BorderSide.none,
+            left: alignment.x < 0 ? borderSide : BorderSide.none,
+            right: alignment.x > 0 ? borderSide : BorderSide.none,
+          ),
+          borderRadius: borderRadius,
+        ),
+      ),
+    );
+  }
+
+  // ===========================
+  // NOTE: QR LOGIC
+  // ===========================
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
@@ -164,7 +243,7 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
 
           // Ensure navigation happens after the current frame
           if (mounted) {
-            Future.delayed(const Duration(milliseconds: 100), () {
+            Future.delayed(const Duration(milliseconds: 200), () {
               if (mounted && Navigator.canPop(context)) {
                 Navigator.pop(context);
               }
@@ -175,6 +254,10 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
       }
     });
   }
+
+  // ===========================
+  // NOTE: UTILITIES
+  // ===========================
 
   Future<void> _toggleFlash() async {
     if (controller != null) {
@@ -187,6 +270,12 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
   void _showSnackbar(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+    if (!p) {
+      _showSnackbar('Camera permission is required for scanning.');
+    }
   }
 
   @override

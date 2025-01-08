@@ -31,6 +31,12 @@ const shadow = BoxShadow(
   offset: Offset(0, 2),
 );
 
+const shadowLg = BoxShadow(
+  color: Color(0x409AAEC8),
+  blurRadius: 8.0,
+  offset: Offset(0, 4),
+);
+
 //NOTE: SIZE
 const titleSize = 20.0;
 const subtitleSize = 14.5;

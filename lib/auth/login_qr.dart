@@ -31,22 +31,38 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
   Widget build(BuildContext context) {
     final double cutOutSize = MediaQuery.of(context).size.width * 0.7;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('QR Code Login'),
-          backgroundColor: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'SCAN QR',
+          style: getWhiteSubTitle(),
         ),
-        body: Stack(
-          children: [
-            _buildQRScanner(),
-            _buildCustomBorders(cutOutSize),
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(),
-              ),
-          ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: IconButton(
+            icon: Image.asset(
+              'assets/icon/custom_icon.png',
+              scale: 12,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          _buildQRScanner(),
+          _buildCustomBorders(cutOutSize),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(color: secondaryColor),
+            ),
+        ],
       ),
     );
   }
@@ -63,12 +79,12 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
             key: qrKey,
             onQRViewCreated: _onQRViewCreated,
             overlay: QrScannerOverlayShape(
-              overlayColor: Colors.transparent,
-              borderColor: secondaryColor,
-              borderRadius: roundedCornerLG,
+              overlayColor: Colors.black54,
+              borderColor: Colors.transparent,
+              borderRadius: roundedCornerSM,
               borderLength: 32,
               borderWidth: 6,
-              cutOutSize: MediaQuery.of(context).size.width * 0.6,
+              cutOutSize: MediaQuery.of(context).size.width * 0.7,
             ),
             onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
           ),
@@ -79,16 +95,24 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
   }
 
   Widget _buildFlashButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+    return Container(
+      color: Colors.transparent,
+      margin: const EdgeInsets.only(bottom: mdMargin),
+      padding: const EdgeInsets.only(
+        bottom: defaultPadding * 1.6,
+        top: mdPadding,
+      ),
       child: InkWell(
         onTap: _toggleFlash,
         child: Container(
-          width: 150,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          width: 120,
+          padding: const EdgeInsets.symmetric(
+            horizontal: defaultPadding,
+            vertical: defaultPadding - 2,
+          ),
           decoration: BoxDecoration(
-            color: _isFlashOn ? Colors.grey : Colors.grey[800],
-            borderRadius: BorderRadius.circular(roundedCornerLG),
+            color: _isFlashOn ? primaryColor : Colors.blue[300],
+            borderRadius: BorderRadius.circular(roundedCornerSM),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -100,12 +124,9 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
                 color: secondaryColor,
               ),
               const SizedBox(width: 4),
-              const Text(
+              Text(
                 'Flash',
-                style: TextStyle(
-                  color: secondaryColor,
-                  fontSize: 14,
-                ),
+                style: getWhiteSubTitle(),
               ),
             ],
           ),
@@ -129,7 +150,7 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
   }
 
   Widget _buildCornerBorder(int index) {
-    const borderSide = BorderSide(width: 6, color: secondaryColor);
+    const borderSide = BorderSide(width: 4, color: secondaryColor);
     BorderRadius borderRadius;
     Alignment alignment;
 
