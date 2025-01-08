@@ -100,14 +100,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  formatDate(dateShift),
-                                  style: getTitle(),
-                                ),
-                              ],
-                            ),
+                            Text(formatDate(dateShift), style: getTitle()),
 
                             // 1st
                             _buildCheckIn(
@@ -170,9 +163,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               children: [
                 Text(
                   '• ',
-                  style: title != 'N/A'
-                      ? getTitle().copyWith(color: textColor)
-                      : getTitle(),
+                  style: getTitle().copyWith(color: textColor),
                 ),
                 Text(shiftTitle, style: getSubTitle()),
               ],
@@ -207,9 +198,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           children: [
             Text(
               '• ',
-              style: status != 'N/A'
-                  ? getTitle().copyWith(color: textColor)
-                  : getTitle(),
+              style: getTitle().copyWith(color: textColor),
             ),
             Text(shiftTitle, style: getSubTitle()),
             const SizedBox(width: defaultPadding * 1.3),
@@ -223,13 +212,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ),
           ],
         ),
-        if (status != 'N/A')
-          ListTile(
-            title: Text(
-              'Time: $time',
-              style: getSubTitle().copyWith(fontSize: 16),
-            ),
+        ListTile(
+          title: Text(
+            'Time: $time',
+            style: getSubTitle().copyWith(fontSize: 16),
           ),
+        ),
       ],
     );
   }
