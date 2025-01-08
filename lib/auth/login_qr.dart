@@ -71,64 +71,75 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
   // NOTE: UI COMPONENTS
   // ===========================
 
+  // Widget _buildQRScanner() {
+  //   return Column(
+  //     children: [
+  //       Expanded(
+  //         child: QRView(
+  //           key: qrKey,
+  //           onQRViewCreated: _onQRViewCreated,
+  //           overlay: QrScannerOverlayShape(
+  //             overlayColor: Colors.black54,
+  //             borderColor: Colors.transparent,
+  //             borderRadius: roundedCornerSM,
+  //             borderLength: 32,
+  //             borderWidth: 6,
+  //             cutOutSize: MediaQuery.of(context).size.width * 0.7,
+  //           ),
+  //           onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
+  //         ),
+  //       ),
+  //       _buildFlashButton(),
+  //     ],
+  //   );
+  // }
+
   Widget _buildQRScanner() {
-    return Column(
+    return Stack(
       children: [
-        Expanded(
+        Positioned.fill(
           child: QRView(
             key: qrKey,
             onQRViewCreated: _onQRViewCreated,
             overlay: QrScannerOverlayShape(
               overlayColor: Colors.black54,
               borderColor: Colors.transparent,
-              borderRadius: roundedCornerSM,
+              borderRadius: roundedCornerLG,
               borderLength: 32,
-              borderWidth: 6,
+              borderWidth: 8,
+              cutOutBottomOffset: 75,
               cutOutSize: MediaQuery.of(context).size.width * 0.7,
             ),
             onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
           ),
         ),
-        _buildFlashButton(),
+        Positioned(
+          bottom: MediaQuery.of(context).size.height * 0.2,
+          left: 0,
+          right: 0,
+          child: _buildFlashButton(),
+        ),
       ],
     );
   }
 
   Widget _buildFlashButton() {
-    return Container(
-      color: Colors.transparent,
-      margin: const EdgeInsets.only(bottom: mdMargin),
-      padding: const EdgeInsets.only(
-        bottom: defaultPadding * 1.6,
-        top: mdPadding,
-      ),
+    return Center(
       child: InkWell(
         onTap: _toggleFlash,
         child: Container(
-          width: 120,
-          padding: const EdgeInsets.symmetric(
-            horizontal: defaultPadding,
-            vertical: defaultPadding - 2,
-          ),
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
-            color: _isFlashOn ? primaryColor : Colors.blue[300],
-            borderRadius: BorderRadius.circular(roundedCornerSM),
+            color: _isFlashOn ? secondaryColor : Colors.white38,
+            borderRadius: BorderRadius.circular(50),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                _isFlashOn
-                    ? Icons.flashlight_on_rounded
-                    : Icons.flashlight_off_rounded,
-                color: secondaryColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Flash',
-                style: getWhiteSubTitle(),
-              ),
-            ],
+          child: Icon(
+            _isFlashOn
+                ? Icons.flashlight_on_rounded
+                : Icons.flashlight_off_rounded,
+            color: _isFlashOn ? primaryColor : secondaryColor,
+            size: 32,
           ),
         ),
       ),

@@ -126,7 +126,6 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                               vertical: mdPadding,
                             ),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.green, width: 2),
                               color: buttonColor,
                               borderRadius:
                                   BorderRadius.circular(roundedCornerSM - 2),
