@@ -12,15 +12,15 @@ class CardBodyWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Card(
-        color: secondaryColor,
-        elevation: 2,
-        shape: RoundedRectangleBorder(
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(roundedCornerMD),
+          color: secondaryColor,
+          boxShadow: const [shadowLg],
         ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          height: MediaQuery.of(context).size.height * 0.3,
+          height: MediaQuery.of(context).size.height * 0.5,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

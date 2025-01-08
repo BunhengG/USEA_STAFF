@@ -86,11 +86,13 @@ class _CardScreenState extends State<CardScreen> {
               return Column(
                 children: [
                   // Display the list of Cards
-                  Card(
-                    color: secondaryColor,
-                    margin: const EdgeInsets.all(mdPadding),
-                    shape: RoundedRectangleBorder(
+                  Container(
+                    margin: const EdgeInsets.all(mdMargin),
+                    padding: const EdgeInsets.symmetric(vertical: mdMargin),
+                    decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(roundedCornerMD),
+                      color: secondaryColor,
+                      boxShadow: const [shadowLg],
                     ),
                     child: ListView.separated(
                       shrinkWrap: true,
@@ -143,7 +145,10 @@ class _CardScreenState extends State<CardScreen> {
                                       _buildTextDetails(
                                           'UserId : ', card.userId),
                                       _buildTextDetails(
-                                          'Gender : ', card.gender),
+                                          'Gender : ',
+                                          card.gender == 'M'
+                                              ? 'Male'
+                                              : 'Female'),
                                       _buildTextDetails(
                                         'DOB : ',
                                         card.dob!

@@ -223,7 +223,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                   ),
                                   child: Container(
                                     width: 50.0,
-                                    height: 3.0,
+                                    height: 2.0,
                                     decoration: BoxDecoration(
                                       color: Colors.amber.withOpacity(0.6),
                                       borderRadius: BorderRadius.circular(5.0),

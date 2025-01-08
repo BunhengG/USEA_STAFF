@@ -13,28 +13,31 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: backgroundColor,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                const SizedBox(height: smPadding),
-                const ScrollableAppBar(),
-                const SizedBox(height: defaultPadding),
-                const Profile(),
-                const WorkingPeriodSection(),
-                const SizedBox(height: defaultPadding),
-                MenuGrid(),
-                const SizedBox(height: defaultPadding),
-                const SectionHeader(),
-                const SizedBox(height: defaultPadding),
-                const TaskTabs(),
-                const SizedBox(height: defaultPadding),
-              ],
+    return Container(
+      color: backgroundColor,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const SizedBox(height: smPadding),
+                  const ScrollableAppBar(),
+                  const SizedBox(height: defaultPadding),
+                  const Profile(),
+                  const WorkingPeriodSection(),
+                  const SizedBox(height: defaultPadding),
+                  MenuGrid(),
+                  const SizedBox(height: defaultPadding),
+                  const SectionHeader(),
+                  const SizedBox(height: defaultPadding),
+                  const TaskTabs(),
+                  const SizedBox(height: defaultPadding),
+                ],
+              ),
             ),
           ),
         ),

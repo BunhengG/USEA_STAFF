@@ -133,12 +133,12 @@ class _MemberScreenState extends State<MemberScreen> {
                       child: Padding(
                         padding:
                             const EdgeInsets.symmetric(horizontal: mdPadding),
-                        child: Card(
-                          color: secondaryColor,
-                          elevation: 1,
-                          shape: RoundedRectangleBorder(
+                        child: Container(
+                          decoration: BoxDecoration(
                             borderRadius:
-                                BorderRadius.circular(roundedCornerSM),
+                                BorderRadius.circular(roundedCornerMD),
+                            color: secondaryColor,
+                            boxShadow: const [shadowLg],
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(mdPadding),
