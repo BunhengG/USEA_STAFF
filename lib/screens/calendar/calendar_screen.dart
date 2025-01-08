@@ -43,7 +43,11 @@ class _CalendarScreenState extends State<CalendarScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Calendar'),
+      backgroundColor: backgroundColor,
+      appBar: CustomAppBar(
+        title: 'Calendar',
+        backgroundColor: secondaryColor,
+      ),
       body: Column(
         children: [
           const Padding(
@@ -52,49 +56,55 @@ class _CalendarScreenState extends State<CalendarScreen>
           ),
 
           // TabBar
-          TabBar(
-            controller: _tabController,
-            labelColor: primaryColor,
-            unselectedLabelColor: placeholderColor,
-            indicatorColor: primaryColor,
-            indicatorWeight: 2,
-            tabs: const [
-              Tab(text: 'Workday / Time'),
-              Tab(text: 'Holiday'),
-            ],
+          Container(
+            color: secondaryColor,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: primaryColor,
+              unselectedLabelColor: placeholderColor,
+              indicatorColor: primaryColor,
+              indicatorWeight: 2,
+              tabs: const [
+                Tab(text: 'Workday / Time'),
+                Tab(text: 'Holiday'),
+              ],
+            ),
           ),
 
           //NOTE: TabBarView for ListView under each Tab
           Expanded(
-            child: Consumer<CalendarProvider>(
-              builder: (context, calendarProvider, child) {
-                if (calendarProvider.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Consumer<CalendarProvider>(
+                builder: (context, calendarProvider, child) {
+                  if (calendarProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (calendarProvider.errorMessage != null) {
-                  return _buildError(calendarProvider.errorMessage!);
-                }
+                  if (calendarProvider.errorMessage != null) {
+                    return _buildError(calendarProvider.errorMessage!);
+                  }
 
-                return TabBarView(
-                  controller: _tabController,
-                  children: [
-                    //* Tab 1
-                    _buildCalendarList(
-                      calendarProvider.calendars
-                          .where((c) => c.attendStatus == 'Present')
-                          .toList(),
-                      'No workdays found.',
-                    ),
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      //* Tab 1
+                      _buildCalendarList(
+                        calendarProvider.calendars
+                            .where((c) => c.attendStatus == 'Present')
+                            .toList(),
+                        'No workdays found.',
+                      ),
 
-                    //* Tab 2
-                    _buildHolidayList(
-                      calendarProvider.holidays,
-                      'No holidays found.',
-                    ),
-                  ],
-                );
-              },
+                      //* Tab 2
+                      _buildHolidayList(
+                        calendarProvider.holidays,
+                        'No holidays found.',
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -130,84 +140,111 @@ class _CalendarScreenState extends State<CalendarScreen>
         final calendar = calendars[index];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: smPadding),
-          child: Card(
-            margin: const EdgeInsets.only(top: smMargin),
-            color: secondaryColor,
-            elevation: 1,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(roundedCornerMD),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: defaultPadding),
+            decoration: BoxDecoration(
+              color: secondaryColor,
+              borderRadius: BorderRadius.circular(roundedCornerSM),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(mdPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        calendar.day.length > 3
-                            ? calendar.day.substring(0, 3)
-                            : calendar.day,
-                        style: getTitle(),
-                      ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      calendar.day.length > 3
+                          ? calendar.day.substring(0, 3)
+                          : calendar.day,
+                      style: getTitle(),
+                    ),
 
-                      //* Vertical Divider
-                      Container(
-                        height: 50,
-                        width: 3,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(roundedCornerSM),
+                    //* Vertical Divider
+                    Container(
+                      height: 50,
+                      width: 3,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(roundedCornerSM),
+                      ),
+                    ),
+
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Workday',
+                              style: getTitle().copyWith(
+                                fontSize: 16,
+                                color: anvColor,
+                              ),
+                            ),
+                            Text(
+                              '\t\t / \t\t',
+                              style: getTitle().copyWith(
+                                fontSize: 16,
+                                color: anvColor,
+                              ),
+                            ),
+                            Text(
+                              'Time',
+                              style: getTitle().copyWith(
+                                fontSize: 16,
+                                color: anvColor,
+                              ),
+                            ),
+                          ],
                         ),
-                        margin:
-                            const EdgeInsets.symmetric(horizontal: mdPadding),
-                      ),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text('Workday', style: getSubTitle()),
-                              Text(' / ', style: getSubTitle()),
-                              Text('Time', style: getSubTitle()),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                calendar.date
-                                    .toLocal()
-                                    .toString()
-                                    .split(' ')[0],
-                                style: getBody().copyWith(color: primaryColor),
-                              ),
-                              const SizedBox(width: mdPadding),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${calendar.morningTime} AM',
-                                    style: getBody(),
+                        const SizedBox(height: smPadding - 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              calendar.date.toLocal().toString().split(' ')[0],
+                              style: getSubTitle(),
+                            ),
+                            const SizedBox(width: mdPadding),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '\t\t ${calendar.morningTime} AM',
+                                  style: getSubTitle().copyWith(
+                                    color: textColor,
                                   ),
-                                  Text(
-                                    '${calendar.afternoonTime} PM',
-                                    style: getBody(),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2.0,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-                ],
-              ),
+                                  child: Container(
+                                    width: 50.0,
+                                    height: 3.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber.withOpacity(0.6),
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '\t\t ${calendar.afternoonTime} PM',
+                                  style: getSubTitle().copyWith(
+                                    color: textColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              ],
             ),
           ),
         );
@@ -230,11 +267,10 @@ class _CalendarScreenState extends State<CalendarScreen>
         final holiday = holidays[index];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: smPadding),
-          child: Card(
-            color: secondaryColor,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(roundedCornerMD),
+          child: Container(
+            decoration: BoxDecoration(
+              color: secondaryColor,
+              borderRadius: BorderRadius.circular(roundedCornerSM),
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.all(mdPadding),

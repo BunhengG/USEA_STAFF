@@ -16,7 +16,7 @@ const hbdColor = Color(0xFF720000);
 const anvColor = Color(0xFF004297);
 const atvColor = Color(0xFF16C47F);
 const uAtvColor = Color(0xFFF72C5B);
-const uAtvShape = Color(0xFFBCCCDC);
+const uAtvShape = Color.fromARGB(255, 213, 228, 243);
 
 //NOTE: ROUNDED CORNER
 const roundedCornerXL = 26.0;

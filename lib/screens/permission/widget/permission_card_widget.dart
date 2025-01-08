@@ -20,15 +20,15 @@ class PermissionCardWidget extends StatelessWidget {
     final percentage = remainingPermissions / totalPermissions;
 
     return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Card(
-        color: secondaryColor,
-        elevation: 2,
-        shape: RoundedRectangleBorder(
+      padding: const EdgeInsets.all(mdPadding),
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(roundedCornerMD),
+          color: secondaryColor,
+          boxShadow: const [shadowLg],
         ),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: smPadding),
           height: MediaQuery.of(context).size.height * 0.3,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

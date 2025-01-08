@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:usea_staff_test/constant/constant.dart';
 import '../../Components/custom_appbar_widget.dart';
 import '../../provider/attendance_provider.dart';
@@ -51,7 +52,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           if (attendanceProvider.attendances.isEmpty) {
             return Center(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'No attendance records found.',
                   style: getSubTitle(),
@@ -68,75 +69,68 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             itemCount: attendanceProvider.attendances.length,
             itemBuilder: (context, index) {
               final attendance = attendanceProvider.attendances[index];
+              final shiftSummary = attendance.shiftRecord;
+              final firstShift = shiftSummary.firstShift;
+              final secondShift = shiftSummary.secondShift;
+
+              final dateShift = attendance.date;
+              final firstCheckInTime = firstShift.checkIn.time;
+              final firstCheckInStatus = firstShift.checkIn.status;
+              final firstCheckOutStatus = firstShift.checkOut.status;
+              final firstCheckOutTime = firstShift.checkOut.time;
+
+              final secondCheckInStatus = secondShift.checkIn.status;
+              final secondCheckInTime = secondShift.checkIn.time;
+              final secondCheckOutStatus = secondShift.checkOut.status;
+              final secondCheckOutTime = secondShift.checkOut.time;
+
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: mdPadding),
-                child: Card(
-                  color: secondaryColor,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: const [shadowLg],
                     borderRadius: BorderRadius.circular(roundedCornerSM),
+                    color: secondaryColor,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(mdPadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              attendance.attendStatus == 'A1' ? 'A1' : 'A2',
-                              style: attendance.attendStatus == 'A1'
-                                  ? getTitle()
-                                  : getTitle().copyWith(color: uAtvColor),
-                            ),
-
-                            //* Vertical Divider
-                            Container(
-                              height: 50,
-                              width: 3,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius:
-                                    BorderRadius.circular(roundedCornerSM),
-                              ),
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                            ),
-
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                //* Title Section
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Check In / Out',
-                                      style: getSubTitle().copyWith(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(width: mdPadding),
-                                    Text(
-                                      attendance.date
-                                          .toLocal()
-                                          .toString()
-                                          .split(' ')[0],
-                                      style: getBody()
-                                          .copyWith(color: primaryColor),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: mdPadding),
                                 Text(
-                                  '🔵 ${attendance.firstShiftCheckIn} AM',
-                                  style: getBody(),
-                                ),
-                                Text(
-                                  '🔵 ${attendance.firstShiftCheckOut} PM',
-                                  style: getBody(),
+                                  formatDate(dateShift),
+                                  style: getTitle(),
                                 ),
                               ],
+                            ),
+
+                            // 1st
+                            _buildCheckIn(
+                              '1st Check-in : ',
+                              firstCheckInTime,
+                              firstCheckInStatus,
+                            ),
+                            _buildCheckout(
+                              '1st Check-out : ',
+                              firstCheckOutTime,
+                              firstCheckOutStatus,
+                            ),
+
+                            // 2st
+                            _buildCheckIn(
+                              '2st Check-in : ',
+                              secondCheckInTime,
+                              secondCheckInStatus,
+                            ),
+                            _buildCheckout(
+                              '2st Check-out : ',
+                              secondCheckOutTime,
+                              secondCheckOutStatus,
                             ),
                           ],
                         ),
@@ -146,10 +140,97 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 ),
               );
             },
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            separatorBuilder: (context, index) =>
+                const SizedBox(height: defaultMargin * 1.5),
           );
         },
       ),
+    );
+  }
+
+  String formatDate(String date) {
+    try {
+      return DateFormat('dd MMMM yyyy').format(DateTime.parse(date));
+    } catch (e) {
+      return date;
+    }
+  }
+
+  Widget _buildCheckIn(
+    String shiftTitle,
+    String title,
+    String value,
+  ) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            //! st Check-in
+            Row(
+              children: [
+                Text(
+                  '• ',
+                  style: title != 'N/A'
+                      ? getTitle().copyWith(color: textColor)
+                      : getTitle(),
+                ),
+                Text(shiftTitle, style: getSubTitle()),
+              ],
+            ),
+            const SizedBox(width: defaultPadding * 2),
+
+            Text(
+              value,
+              style: getBody().copyWith(fontSize: 14),
+            )
+          ],
+        ),
+        //? Time
+        ListTile(
+          title: Text(
+            'Time : $title',
+            style: getSubTitle().copyWith(fontSize: 16),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckout(
+    String shiftTitle,
+    String time,
+    String status,
+  ) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              '• ',
+              style: status != 'N/A'
+                  ? getTitle().copyWith(color: textColor)
+                  : getTitle(),
+            ),
+            Text(shiftTitle, style: getSubTitle()),
+            const SizedBox(width: defaultPadding * 1.3),
+            Text(
+              status == 'N/A'
+                  ? ''
+                  : status == 'Good'
+                      ? '🔵 Good'
+                      : '',
+              style: getBody().copyWith(fontSize: 14),
+            ),
+          ],
+        ),
+        if (status != 'N/A')
+          ListTile(
+            title: Text(
+              'Time: $time',
+              style: getSubTitle().copyWith(fontSize: 16),
+            ),
+          ),
+      ],
     );
   }
 }

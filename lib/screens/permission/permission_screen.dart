@@ -99,11 +99,11 @@ class _PermissionScreenState extends State<PermissionScreen> {
                         final permission =
                             permissionProvider.permissions[index];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                          child: Card(
-                            color: secondaryColor,
-                            elevation: 1,
-                            shape: RoundedRectangleBorder(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: mdPadding),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: secondaryColor,
                               borderRadius:
                                   BorderRadius.circular(roundedCornerSM),
                             ),

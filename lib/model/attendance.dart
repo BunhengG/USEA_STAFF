@@ -1,67 +1,114 @@
 class AttendanceItem {
-  final int id;
   final String userId;
-  final String username;
-  final DateTime date;
-  final DateTime? firstShiftCheckIn;
-  final DateTime? firstShiftCheckOut;
-  final DateTime? secondShiftCheckIn;
-  final DateTime? secondShiftCheckOut;
-  final String attendStatus;
+  final String name;
+  final String shift;
+  final String date;
+  final ShiftRecord shiftRecord;
 
   AttendanceItem({
-    required this.id,
     required this.userId,
-    required this.username,
+    required this.name,
+    required this.shift,
     required this.date,
-    this.firstShiftCheckIn,
-    this.firstShiftCheckOut,
-    this.secondShiftCheckIn,
-    this.secondShiftCheckOut,
-    required this.attendStatus,
+    required this.shiftRecord,
   });
 
   factory AttendanceItem.fromJson(Map<String, dynamic> json) {
     return AttendanceItem(
-      id: json['id'],
-      userId: json['userId'],
-      username: json['username'],
-      date: DateTime.parse(json['date']),
-      firstShiftCheckIn: json['firstShiftCheckIn'] != null
-          ? DateTime.parse(json['firstShiftCheckIn'])
-          : null,
-      firstShiftCheckOut: json['firstShiftCheckOut'] != null
-          ? DateTime.parse(json['firstShiftCheckOut'])
-          : null,
-      secondShiftCheckIn: json['secondShiftCheckIn'] != null
-          ? DateTime.parse(json['secondShiftCheckIn'])
-          : null,
-      secondShiftCheckOut: json['secondShiftCheckOut'] != null
-          ? DateTime.parse(json['secondShiftCheckOut'])
-          : null,
-      attendStatus: json['attendStatus'],
+      userId: json['userId'] ?? 'Unknown',
+      name: json['name'] ?? 'Unknown',
+      shift: json['shift'] ?? 'Unknown',
+      date: json['date'] ?? 'Unknown',
+      shiftRecord: ShiftRecord.fromJson(json['shiftRecord'] ?? {}),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'userId': userId,
-      'username': username,
-      'date': date.toIso8601String(),
-      'firstShiftCheckIn': firstShiftCheckIn?.toIso8601String(),
-      'firstShiftCheckOut': firstShiftCheckOut?.toIso8601String(),
-      'secondShiftCheckIn': secondShiftCheckIn?.toIso8601String(),
-      'secondShiftCheckOut': secondShiftCheckOut?.toIso8601String(),
-      'attendStatus': attendStatus,
+      'name': name,
+      'shift': shift,
+      'date': date,
+      'shiftRecord': shiftRecord.toJson(),
     };
   }
 }
 
-List<AttendanceItem> attendanceItemFromJson(List<dynamic> jsonList) {
-  return jsonList.map((json) => AttendanceItem.fromJson(json)).toList();
+// Represents the entire shift record containing firstShift and secondShift
+class ShiftRecord {
+  final ShiftDetails firstShift;
+  final ShiftDetails secondShift;
+
+  ShiftRecord({
+    required this.firstShift,
+    required this.secondShift,
+  });
+
+  factory ShiftRecord.fromJson(Map<String, dynamic> json) {
+    return ShiftRecord(
+      firstShift: ShiftDetails.fromJson(json['firstShift'] ?? {}),
+      secondShift: ShiftDetails.fromJson(json['secondShift'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'firstShift': firstShift.toJson(),
+      'secondShift': secondShift.toJson(),
+    };
+  }
 }
 
-List<Map<String, dynamic>> attendanceItemToJson(List<AttendanceItem> items) {
-  return items.map((item) => item.toJson()).toList();
+// Represents checkIn and checkOut details for a single shift
+class ShiftDetails {
+  final ShiftTimeDetails checkIn;
+  final ShiftTimeDetails checkOut;
+
+  ShiftDetails({
+    required this.checkIn,
+    required this.checkOut,
+  });
+
+  factory ShiftDetails.fromJson(Map<String, dynamic> json) {
+    return ShiftDetails(
+      checkIn: ShiftTimeDetails.fromJson(json['checkIn'] ?? {}),
+      checkOut: ShiftTimeDetails.fromJson(json['checkOut'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'checkIn': checkIn.toJson(),
+      'checkOut': checkOut.toJson(),
+    };
+  }
+}
+
+// Represents time, status, and reason for checkIn and checkOut
+class ShiftTimeDetails {
+  final String time;
+  final String status;
+  final String reason;
+
+  ShiftTimeDetails({
+    required this.time,
+    required this.status,
+    required this.reason,
+  });
+
+  factory ShiftTimeDetails.fromJson(Map<String, dynamic> json) {
+    return ShiftTimeDetails(
+      time: json['time'] ?? 'N/A',
+      status: json['status'] ?? 'N/A',
+      reason: json['reason'] ?? 'N/A',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'time': time,
+      'status': status,
+      'reason': reason,
+    };
+  }
 }
