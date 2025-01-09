@@ -36,15 +36,15 @@ class ScrollableAppBar extends StatelessWidget {
           // Modal content
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(defaultPadding * 1.5),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Select Language',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: getSubTitle(),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: mdPadding),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -56,10 +56,16 @@ class ScrollableAppBar extends StatelessWidget {
                           },
                           child: Column(
                             children: [
-                              Image.asset('assets/icon/khmer.png',
-                                  width: 60, height: 60),
-                              const SizedBox(height: 8),
-                              const Text('Khmer'),
+                              Image.asset(
+                                'assets/icon/khmer.png',
+                                width: 60,
+                                height: 60,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Khmer',
+                                style: getBody(),
+                              ),
                             ],
                           ),
                         ),
@@ -72,10 +78,16 @@ class ScrollableAppBar extends StatelessWidget {
                           },
                           child: Column(
                             children: [
-                              Image.asset('assets/icon/english.png',
-                                  width: 60, height: 60),
-                              const SizedBox(height: 8),
-                              const Text('English'),
+                              Image.asset(
+                                'assets/icon/english.png',
+                                width: 60,
+                                height: 60,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'English',
+                                style: getBody(),
+                              ),
                             ],
                           ),
                         ),

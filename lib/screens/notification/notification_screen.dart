@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:usea_staff_test/Components/custom_appbar_widget.dart';
+import 'package:usea_staff_test/constant/constant.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -6,14 +8,15 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notification'),
-      ),
-      body: const Center(
+      appBar: CustomAppBar(title: 'Notifications'),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome to the Notification App!'),
+            Text(
+              'Welcome to the Notifications!',
+              style: getSubTitle(),
+            ),
           ],
         ),
       ),
