@@ -20,7 +20,7 @@ class CheckInOutProvider with ChangeNotifier {
 
   final double fixedLatitude = 13.350918350149795;
   final double fixedLongitude = 103.86433962916841;
-  final double allowedRange = 10.0;
+  final double allowedRange = 50.0;
 
   // Method to set the shiftStatus and notify listeners
   void setShiftStatus(String status) {
