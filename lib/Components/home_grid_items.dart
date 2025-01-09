@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:reorderable_grid_view/reorderable_grid_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usea_staff_test/screens/attendance/attendance_screen.dart';
 import 'package:usea_staff_test/screens/calendar/calendar_screen.dart';
 import 'package:usea_staff_test/screens/card/card_screen.dart';
@@ -8,8 +10,15 @@ import 'package:usea_staff_test/screens/permission/permission_screen.dart';
 import '../constant/constant.dart';
 import '../screens/scan_qr/CheckIn_out.dart';
 
-class MenuGrid extends StatelessWidget {
-  final List<Map<String, dynamic>> menuItems = [
+class MenuGrid extends StatefulWidget {
+  const MenuGrid({super.key});
+
+  @override
+  _MenuGridState createState() => _MenuGridState();
+}
+
+class _MenuGridState extends State<MenuGrid> {
+  List<Map<String, dynamic>> menuItems = [
     {
       'icon': 'assets/icon/attendance.png',
       'label': 'Attendances',
@@ -42,7 +51,81 @@ class MenuGrid extends StatelessWidget {
     },
   ];
 
-  MenuGrid({super.key});
+  int gridColumns = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMenuOrder(); // Load the saved menu order on app startup
+  }
+
+  Future<void> _loadMenuOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedOrder = prefs.getStringList('menuOrder');
+
+    if (savedOrder != null) {
+      setState(() {
+        // Reorder `menuItems` based on savedOrder
+        menuItems.sort((a, b) {
+          int aIndex = savedOrder.indexOf(a['route']);
+          int bIndex = savedOrder.indexOf(b['route']);
+          return aIndex.compareTo(bIndex);
+        });
+      });
+    }
+  }
+
+  Future<void> _saveMenuOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Save the current order of `menuItems` based on their routes
+    final order = menuItems.map((item) => item['route'] as String).toList();
+    await prefs.setStringList('menuOrder', order);
+  }
+
+  // Method to show a dialog for selecting grid columns
+  void _showColumnSelectDialog() {
+    showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Custom GridItems',
+            style: getTitle(),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(
+                  '2 Items',
+                  style: getSubTitle(),
+                ),
+                onTap: () {
+                  Navigator.pop(context, 2);
+                },
+              ),
+              const Divider(thickness: 0.5),
+              ListTile(
+                title: Text(
+                  '3 Items',
+                  style: getSubTitle(),
+                ),
+                onTap: () {
+                  Navigator.pop(context, 3);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          gridColumns = value;
+        });
+      }
+    });
+  }
 
   Widget getPage(String route) {
     switch (route) {
@@ -65,56 +148,68 @@ class MenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundShape,
-        borderRadius: BorderRadius.circular(roundedCornerMD),
-      ),
-      padding: const EdgeInsets.all(smPadding - 2),
-      child: GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: menuItems.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 5,
-          mainAxisSpacing: 5,
-          childAspectRatio: 2.5 / 2,
+    return GestureDetector(
+      onLongPress: _showColumnSelectDialog,
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundShape,
+          borderRadius: BorderRadius.circular(roundedCornerMD),
         ),
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                CustomPageRoute(
-                  child: getPage(menuItems[index]['route']),
+        padding: const EdgeInsets.all(smPadding - 2),
+        child: ReorderableGridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 0),
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: gridColumns,
+            crossAxisSpacing: 5,
+            mainAxisSpacing: 5,
+            childAspectRatio: 2.5 / 2,
+          ),
+          itemCount: menuItems.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              key: ValueKey(menuItems[index]),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CustomPageRoute(
+                    child: getPage(menuItems[index]['route']),
+                  ),
+                );
+              },
+              // onLongPress: _showColumnSelectDialog,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: secondaryColor,
+                  borderRadius: BorderRadius.circular(roundedCornerSM),
                 ),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: secondaryColor,
-                borderRadius: BorderRadius.circular(roundedCornerSM),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      menuItems[index]['icon'],
+                      width: 40,
+                      height: 40,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      menuItems[index]['label'],
+                      style: getBody().copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    menuItems[index]['icon'],
-                    width: 40,
-                    height: 40,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    menuItems[index]['label'],
-                    style: getBody().copyWith(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+            );
+          },
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              final item = menuItems.removeAt(oldIndex);
+              menuItems.insert(newIndex, item);
+            });
+            _saveMenuOrder();
+          },
+        ),
       ),
     );
   }

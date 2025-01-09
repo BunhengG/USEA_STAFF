@@ -57,6 +57,7 @@ dependencies:
   cached_network_image:
   geolocator:
   timezone:
+  reorderable_grid_view: ^2.2.8
 
 dev_dependencies:
   flutter_test:
