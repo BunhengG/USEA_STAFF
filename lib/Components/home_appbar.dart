@@ -16,10 +16,9 @@ class ScrollableAppBar extends StatelessWidget {
             BorderRadius.vertical(top: Radius.circular(roundedCornerLG)),
       ),
       isScrollControlled: true,
-      backgroundColor: secondaryColor,
+      backgroundColor: backgroundColor,
       builder: (context) => Stack(
         children: [
-          // Background blur
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
@@ -28,7 +27,7 @@ class ScrollableAppBar extends StatelessWidget {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(roundedCornerLG),
                   ),
-                  color: secondaryColor,
+                  color: backgroundColor,
                 ),
               ),
             ),

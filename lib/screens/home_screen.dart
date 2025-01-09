@@ -15,27 +15,27 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: backgroundColor,
-      child: SafeArea(
+      child: const SafeArea(
         child: Scaffold(
           backgroundColor: backgroundColor,
           body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            padding: EdgeInsets.symmetric(horizontal: 12.0),
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  const SizedBox(height: smPadding),
-                  const ScrollableAppBar(),
-                  const SizedBox(height: defaultPadding),
-                  const Profile(),
-                  const WorkingPeriodSection(),
-                  const SizedBox(height: defaultPadding),
+                  SizedBox(height: smPadding),
+                  ScrollableAppBar(),
+                  SizedBox(height: defaultPadding),
+                  Profile(),
+                  WorkingPeriodSection(),
+                  SizedBox(height: defaultPadding),
                   MenuGrid(),
-                  const SizedBox(height: defaultPadding),
-                  const SectionHeader(),
-                  const SizedBox(height: defaultPadding),
-                  const TaskTabs(),
-                  const SizedBox(height: defaultPadding),
+                  SizedBox(height: defaultPadding),
+                  SectionHeader(),
+                  SizedBox(height: defaultPadding),
+                  TaskTabs(),
+                  SizedBox(height: defaultPadding),
                 ],
               ),
             ),
