@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:usea_staff_test/constant/constant.dart';
+import '../../Components/custom_snackbar.dart';
 import '../../provider/check_in_out_provider.dart';
 
 class CheckInOutQRScreen extends StatefulWidget {
@@ -223,9 +224,19 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
         await provider.checkInOut(scanData.code!);
 
         if (provider.errorMessage != null) {
-          _showSnackbar(provider.errorMessage!);
+          // _showSnackbar(provider.errorMessage!);
+          CustomSnackbar(
+            message: provider.errorMessage!,
+            backgroundColor: hbdColor,
+            icon: Icons.warning,
+          );
         } else {
-          _showSnackbar('Check-In/Out successful!');
+          // _showSnackbar('Check-In/Out successful!');
+          const CustomSnackbar(
+            message: 'Check-In/Out successful!',
+            backgroundColor: atvColor,
+            icon: Icons.check_circle,
+          );
 
           // Ensure navigation happens after the current frame
           if (mounted) {
@@ -249,14 +260,19 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
     }
   }
 
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
+  // void _showSnackbar(String message) {
+  //   ScaffoldMessenger.of(context)
+  //       .showSnackBar(SnackBar(content: Text(message)));
+  // }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     if (!p) {
-      _showSnackbar('Camera permission is required for scanning.');
+      // _showSnackbar('Camera permission is required for scanning.');
+      const CustomSnackbar(
+        message: 'Camera permission is required.',
+        backgroundColor: anvColor,
+        icon: Icons.warning,
+      );
     }
   }
 

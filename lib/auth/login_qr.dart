@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:usea_staff_test/constant/constant.dart';
+import '../Components/custom_snackbar.dart';
 import '../api/fetch_user.dart';
 import '../helper/shared_pref_helper.dart';
 import '../screens/home_screen.dart';
@@ -238,7 +239,12 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
 
     final data = result!.code!.split(':');
     if (data.length != 2) {
-      _showSnackbar('Invalid QR code format');
+      // _showSnackbar('Invalid QR code format');
+      const CustomSnackbar(
+        message: 'Invalid QR code format',
+        backgroundColor: hbdColor,
+        icon: Icons.warning,
+      );
       if (mounted) {
         setState(() => _isProcessing = false);
       }
@@ -257,10 +263,16 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
         await Future.delayed(const Duration(seconds: 2));
         _navigateToHomePage();
       } else {
-        _showSnackbar('Invalid userId or password.');
+        // _showSnackbar('Invalid userId or password.');
+        const CustomSnackbar(
+          message: 'Invalid Credentials.',
+          backgroundColor: hbdColor,
+          icon: Icons.warning,
+        );
       }
     } catch (e) {
-      _showSnackbar('An error occurred: $e');
+      // _showSnackbar('An error occurred: $e');
+      print('>> An error occurred: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -288,14 +300,19 @@ class _LoginQRScreenState extends State<LoginQRScreen> {
     }
   }
 
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
+  // void _showSnackbar(String message) {
+  //   ScaffoldMessenger.of(context)
+  //       .showSnackBar(SnackBar(content: Text(message)));
+  // }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     if (!p) {
-      _showSnackbar('Camera permission is required for scanning.');
+      // _showSnackbar('Camera permission is required for scanning.');
+      const CustomSnackbar(
+        message: 'Camera permission is required.',
+        backgroundColor: hbdColor,
+        icon: Icons.warning,
+      );
     }
   }
 
