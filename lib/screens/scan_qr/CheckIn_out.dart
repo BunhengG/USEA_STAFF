@@ -4,6 +4,7 @@ import 'package:usea_staff_test/constant/constant.dart';
 import 'package:provider/provider.dart';
 import '../../helper/shared_pref_helper.dart';
 import '../../provider/check_in_out_provider.dart';
+import 'OpenMap.dart';
 import 'scanQr_screen.dart';
 import 'widget/shift_details.dart';
 
@@ -433,6 +434,29 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                   ],
                 ),
               ),
+              const SizedBox(height: defaultPadding),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OpenMap(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: mdPadding),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(roundedCornerSM),
+                  ),
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    'Open Map',
+                    style: getWhiteSubTitle(),
+                  ),
+                ),
+              )
             ],
           );
         }),

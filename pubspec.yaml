@@ -59,6 +59,7 @@ dependencies:
   timezone:
   reorderable_grid_view: ^2.2.8
   flutter_launcher_icons: ^0.13.1
+  google_maps_flutter: ^2.9.0
 
 dev_dependencies:
   flutter_test:

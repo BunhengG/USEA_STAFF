@@ -26,6 +26,7 @@ class LoginScreen extends StatelessWidget {
           children: [
             _buildLogo(),
             _buildWelcomeText(),
+            const SizedBox(height: mdPadding),
             _buildQRCodeButton(context),
             _buildContactRow(),
           ],
@@ -36,16 +37,28 @@ class LoginScreen extends StatelessWidget {
 
   // Widget for logo image
   Widget _buildLogo() {
-    return Image.asset('assets/img/usealogo.png', scale: 4);
+    return Container(
+      decoration: const BoxDecoration(boxShadow: [
+        BoxShadow(
+          color: Color(0x409AAEC8),
+          blurRadius: roundedCornerSM,
+          offset: Offset(5, 8),
+        ),
+      ]),
+      child: Image.asset(
+        'assets/img/usea_check.png',
+        scale: 3,
+        fit: BoxFit.contain,
+      ),
+    );
   }
 
   // Widget for welcome text
   Widget _buildWelcomeText() {
     return Padding(
-      padding:
-          const EdgeInsets.only(top: defaultPadding, bottom: defaultPadding),
+      padding: const EdgeInsets.only(top: mdPadding, bottom: defaultPadding),
       child: Text(
-        'Welcome to usea staff!'.toUpperCase(),
+        'Welcome to usea check!'.toUpperCase(),
         style: getTitle(),
       ),
     );
