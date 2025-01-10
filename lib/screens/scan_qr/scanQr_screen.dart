@@ -86,9 +86,8 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
                 _buildCustomBorders(cutOutSize),
                 if (provider.isLoading)
                   const Center(
-                      child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  )),
+                    child: CircularProgressIndicator(color: secondaryColor),
+                  ),
               ],
             );
           },
@@ -219,6 +218,26 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
       if (scanData.code != null && !_hasScanned && !isProcessing) {
         _hasScanned = true;
         isProcessing = true;
+
+        //! Validate QR code format before proceeding with the
+
+        if (!scanData.code!.startsWith('usea') || scanData.code!.length < 7) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: CustomSnackbar(
+                message: 'Invalid QR code format.',
+                backgroundColor: uAtvColor,
+                icon: Icons.warning,
+              ),
+              backgroundColor: Colors.transparent,
+              elevation: 0.0,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          // _hasScanned = false;
+          isProcessing = false;
+          return;
+        }
 
         final provider =
             Provider.of<CheckInOutProvider>(context, listen: false);

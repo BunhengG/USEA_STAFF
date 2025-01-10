@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:usea_staff_test/Components/custom_appbar_widget.dart';
 import 'package:usea_staff_test/constant/constant.dart';
 import 'package:provider/provider.dart';
+import '../../Components/custom_snackbar.dart';
 import '../../helper/shared_pref_helper.dart';
 import '../../provider/check_in_out_provider.dart';
 import 'scanQr_screen.dart';
@@ -86,21 +87,29 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
   }
 
   void _handleCheckInOut(BuildContext context) {
-    // Show the bottom sheet to get the reason
+    // NOTE: Show the bottom sheet to get the reason
     _showReasonBottomSheet(context, (reason) {
-      final provider = Provider.of<CheckInOutProvider>(
-        context,
-        listen: false,
-      );
-
-      provider.checkInOut('your_qr_code_here', reason: reason);
-
+      // Navigate to the QR scan screen first
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => CheckInOutQRScreen(reason: reason),
         ),
-      );
+      ).then((qrCode) {
+        // After the QR code is scanned, check its validity
+        if (qrCode != null) {
+          // Proceed to call checkInOut only after scanning
+          final provider =
+              Provider.of<CheckInOutProvider>(context, listen: false);
+          provider.checkInOut(qrCode, reason: reason);
+        } else {
+          const CustomSnackbar(
+            message: 'Invalid QR code format.',
+            backgroundColor: hbdColor,
+            icon: Icons.warning,
+          );
+        }
+      });
     });
   }
 
