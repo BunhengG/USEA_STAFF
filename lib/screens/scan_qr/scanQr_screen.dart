@@ -8,7 +8,9 @@ import '../../Components/custom_snackbar.dart';
 import '../../provider/check_in_out_provider.dart';
 
 class CheckInOutQRScreen extends StatefulWidget {
-  const CheckInOutQRScreen({super.key});
+  final String reason;
+
+  const CheckInOutQRScreen({super.key, required this.reason});
 
   @override
   State<CheckInOutQRScreen> createState() => _CheckInOutQRScreenState();
@@ -221,7 +223,7 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
         final provider =
             Provider.of<CheckInOutProvider>(context, listen: false);
 
-        await provider.checkInOut(scanData.code!);
+        await provider.checkInOut(scanData.code!, reason: widget.reason);
 
         if (provider.errorMessage != null) {
           // _showSnackbar(provider.errorMessage!);

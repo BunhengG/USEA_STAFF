@@ -35,26 +35,95 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
     });
   }
 
+  void _showReasonBottomSheet(
+      BuildContext context, Function(String) onReasonSubmitted) {
+    final TextEditingController reasonController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Reason for being late',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: reasonController,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter reason',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    final reason = reasonController.text.trim();
+                    if (reason.isNotEmpty) {
+                      Navigator.pop(context);
+                      onReasonSubmitted(reason);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Reason cannot be empty')),
+                      );
+                    }
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _handleCheckInOut(BuildContext context) {
+    // Show the bottom sheet to get the reason
+    _showReasonBottomSheet(context, (reason) {
+      final provider = Provider.of<CheckInOutProvider>(
+        context,
+        listen: false,
+      );
+
+      provider.checkInOut('your_qr_code_here', reason: reason);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CheckInOutQRScreen(reason: reason),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: CustomAppBar(title: 'Check Record Details'),
+      appBar: CustomAppBar(title: 'Check Record'),
       body: Padding(
         padding: const EdgeInsets.all(defaultPadding),
         child:
             Consumer<CheckInOutProvider>(builder: (context, provider, child) {
-          // print('Status: >> ${provider.shiftStatus}');
-
           if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: primaryColor),
+            );
           }
 
           if (provider.errorMessage != null) {
             return Center(
               child: Text(
                 provider.errorMessage!,
-                style: const TextStyle(color: Colors.red, fontSize: 16),
+                style: const TextStyle(color: uAtvColor, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
             );
@@ -68,14 +137,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
             case 'checkIn':
               buttonColor = const Color(0xFF4CD964);
               buttonText = 'Check In';
-              onTap = () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CheckInOutQRScreen(),
-                  ),
-                );
-              };
+              onTap = () => _handleCheckInOut(context);
               break;
             case 'checkOut':
               buttonColor = Colors.orange;
@@ -84,7 +146,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CheckInOutQRScreen(),
+                    builder: (context) => const CheckInOutQRScreen(reason: ''),
                   ),
                 );
               };

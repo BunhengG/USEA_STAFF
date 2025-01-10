@@ -30,13 +30,7 @@ class CheckInOutProvider with ChangeNotifier {
 
   //! Method to fetch shift data from the backend and update button state
 
-  //
-  //
-  //
   // ? Start with New Day
-  //
-  //
-  //
 
   Future<void> updateButtonState(String currentTime, String userId) async {
     _isLoading = true;
@@ -113,7 +107,7 @@ class CheckInOutProvider with ChangeNotifier {
     }
   }
 
-  Future<void> checkInOut(String qrCode) async {
+  Future<void> checkInOut(String qrCode, {required String reason}) async {
     if (!qrCode.startsWith('usea') || qrCode.length < 7) {
       _errorMessage = 'Invalid QR code format.';
       notifyListeners();
@@ -157,7 +151,10 @@ class CheckInOutProvider with ChangeNotifier {
         "userId": userId,
         "shift": shift,
         "checkInTime": checkInTime,
+        "reason": reason,
       };
+
+      // print("Sending request: $requestBody");
 
       var response = await http.post(
         Uri.parse(ApiEndpoints.getCheckInOut),
