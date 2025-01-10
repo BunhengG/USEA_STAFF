@@ -28,8 +28,6 @@ class CheckInOutProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //! Method to fetch shift data from the backend and update button state
-
   // ? Start with New Day
 
   Future<void> updateButtonState(String currentTime, String userId) async {
@@ -67,7 +65,7 @@ class CheckInOutProvider with ChangeNotifier {
         final secondShift = shiftRecord['secondShift'];
 
         // Set shift type directly from the backend data
-        _shiftType = shiftData['shift']; // "Morning" or "Afternoon"
+        _shiftType = shiftData['shift'];
 
         // Get today's date to compare with the fetched shift data
         DateTime now = DateTime.now();
@@ -119,11 +117,12 @@ class CheckInOutProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Initialize timezone data for Phnom Penh
+      // for Phnom Penh
       initializeTimeZones();
       final phnomPenh = tz.getLocation('Asia/Phnom_Penh');
       final currentTime = tz.TZDateTime.now(phnomPenh);
       String checkInTime = DateFormat('HH:mm:ss').format(currentTime);
+      String checkOutTime = DateFormat('HH:mm:ss').format(currentTime);
 
       final userId = await SharedPrefHelper.getUserId();
       if (userId == null) {
@@ -151,6 +150,7 @@ class CheckInOutProvider with ChangeNotifier {
         "userId": userId,
         "shift": shift,
         "checkInTime": checkInTime,
+        "checkOutTime": checkOutTime,
         "reason": reason,
       };
 
