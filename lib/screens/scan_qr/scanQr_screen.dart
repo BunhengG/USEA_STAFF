@@ -234,7 +234,6 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
               behavior: SnackBarBehavior.floating,
             ),
           );
-          // _hasScanned = false;
           isProcessing = false;
           return;
         }
@@ -245,16 +244,16 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
         await provider.checkInOut(scanData.code!, reason: widget.reason);
 
         if (provider.errorMessage != null) {
-          // _showSnackbar(provider.errorMessage!);
-          CustomSnackbar(
+          showCustomSnackbar(
+            context,
             message: provider.errorMessage!,
             backgroundColor: hbdColor,
             icon: Icons.warning,
           );
         } else {
-          // _showSnackbar('Check-In/Out successful!');
-          const CustomSnackbar(
-            message: 'Check-In/Out successful!',
+          showCustomSnackbar(
+            context,
+            message: 'Checked successful!',
             backgroundColor: atvColor,
             icon: Icons.check_circle,
           );
@@ -281,15 +280,10 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
     }
   }
 
-  // void _showSnackbar(String message) {
-  //   ScaffoldMessenger.of(context)
-  //       .showSnackBar(SnackBar(content: Text(message)));
-  // }
-
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     if (!p) {
-      // _showSnackbar('Camera permission is required for scanning.');
-      const CustomSnackbar(
+      showCustomSnackbar(
+        context,
         message: 'Camera permission is required.',
         backgroundColor: anvColor,
         icon: Icons.warning,

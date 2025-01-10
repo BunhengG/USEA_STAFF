@@ -47,3 +47,25 @@ class CustomSnackbar extends StatelessWidget {
     );
   }
 }
+
+void showCustomSnackbar(
+  BuildContext context, {
+  required String message,
+  Color backgroundColor = secondaryColor,
+  IconData? icon,
+  Duration duration = const Duration(seconds: 3),
+}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: CustomSnackbar(
+        message: message,
+        backgroundColor: backgroundColor,
+        icon: icon,
+      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0.0,
+      behavior: SnackBarBehavior.floating,
+      duration: duration,
+    ),
+  );
+}

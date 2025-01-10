@@ -99,13 +99,16 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
         // After the QR code is scanned, check its validity
         if (qrCode != null) {
           // Proceed to call checkInOut only after scanning
-          final provider =
-              Provider.of<CheckInOutProvider>(context, listen: false);
+          final provider = Provider.of<CheckInOutProvider>(
+            context,
+            listen: false,
+          );
           provider.checkInOut(qrCode, reason: reason);
         } else {
-          const CustomSnackbar(
+          showCustomSnackbar(
+            context,
             message: 'Invalid QR code format.',
-            backgroundColor: hbdColor,
+            backgroundColor: uAtvColor,
             icon: Icons.warning,
           );
         }
