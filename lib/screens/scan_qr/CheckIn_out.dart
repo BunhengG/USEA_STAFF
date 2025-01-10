@@ -36,9 +36,66 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
     });
   }
 
+  // void _showReasonBottomSheet(
+  //     BuildContext context, Function(String) onReasonSubmitted) {
+  //   final TextEditingController reasonController = TextEditingController();
+
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     builder: (BuildContext context) {
+  //       return Padding(
+  //         padding: MediaQuery.of(context).viewInsets,
+  //         child: Container(
+  //           padding: const EdgeInsets.all(16.0),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               const Text(
+  //                 'Reason for being late',
+  //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //               ),
+  //               const SizedBox(height: 16),
+  //               TextField(
+  //                 controller: reasonController,
+  //                 decoration: const InputDecoration(
+  //                   labelText: 'Enter reason',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 16),
+  //               ElevatedButton(
+  //                 onPressed: () {
+  //                   final reason = reasonController.text.trim();
+  //                   if (reason.isNotEmpty) {
+  //                     Navigator.pop(context);
+  //                     onReasonSubmitted(reason);
+  //                   } else {
+  //                     ScaffoldMessenger.of(context).showSnackBar(
+  //                       const SnackBar(content: Text('Reason cannot be empty')),
+  //                     );
+  //                   }
+  //                 },
+  //                 child: const Text('Submit'),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
   void _showReasonBottomSheet(
       BuildContext context, Function(String) onReasonSubmitted) {
     final TextEditingController reasonController = TextEditingController();
+
+    // Predefined reasons
+    final List<String> predefinedReasons = [
+      'Sorry I\'m late.',
+      'Sorry, Traffic is bad.',
+      'Sorry I\'m Sick.',
+    ];
 
     showModalBottomSheet(
       context: context,
@@ -47,25 +104,78 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
         return Padding(
           padding: MediaQuery.of(context).viewInsets,
           child: Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Reason for being late',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Text(
+                  'Why you are late?',
+                  style: getSubTitle().copyWith(color: primaryColor),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: smPadding - 2),
+
+                Text(
+                  'Please fill or  selecting the reason box.',
+                  style: getBody(),
+                ),
+                const SizedBox(height: defaultPadding),
+
+                //? Custom input field
                 TextField(
                   controller: reasonController,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter reason',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    hintText: 'Tell reason...',
+                    hintStyle: getBody(),
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.all(mdPadding),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: primaryColor, width: 2.0),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: primaryColor, width: 2.0),
+                    ),
                   ),
+                  maxLines: 4,
+                  keyboardType: TextInputType.multiline,
+                  textAlignVertical: TextAlignVertical.top,
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
+
+                const SizedBox(height: defaultPadding),
+
+                //? Display predefined reasons as buttons
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: predefinedReasons.map((reason) {
+                    return GestureDetector(
+                      onTap: () {
+                        reasonController.text = reason;
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: smPadding,
+                          horizontal: smPadding,
+                        ),
+                        decoration: BoxDecoration(
+                          color: uAtvShape,
+                          borderRadius: BorderRadius.circular(
+                            roundedCornerSM - 4,
+                          ),
+                        ),
+                        child: Text(
+                          reason,
+                          style: getBody(),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: defaultPadding),
+
+                // Submit button
+                GestureDetector(
+                  onTap: () {
                     final reason = reasonController.text.trim();
                     if (reason.isNotEmpty) {
                       Navigator.pop(context);
@@ -76,8 +186,25 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                       );
                     }
                   },
-                  child: const Text('Submit'),
+                  child: Container(
+                    width: 120,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: mdPadding,
+                      horizontal: mdPadding,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(roundedCornerSM),
+                    ),
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      'Submit',
+                      style: getWhiteSubTitle(),
+                    ),
+                  ),
                 ),
+
+                const SizedBox(height: defaultPadding),
               ],
             ),
           ),
@@ -89,16 +216,16 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
   void _handleCheckInOut(BuildContext context) {
     // NOTE: Show the bottom sheet to get the reason
     _showReasonBottomSheet(context, (reason) {
-      // Navigate to the QR scan screen first
+      //* Navigate to the QR scan screen first
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => CheckInOutQRScreen(reason: reason),
         ),
       ).then((qrCode) {
-        // After the QR code is scanned, check its validity
+        //* After the QR code is scanned, check its validity
         if (qrCode != null) {
-          // Proceed to call checkInOut only after scanning
+          //* Proceed to call checkInOut only after scanning
           final provider = Provider.of<CheckInOutProvider>(
             context,
             listen: false,
