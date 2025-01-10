@@ -174,14 +174,19 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget> {
               ],
             ),
             const SizedBox(width: defaultPadding * 1.3),
-            Text(
-              title == 'N/A'
-                  ? ''
-                  : title == 'Good'
-                      ? '🔵 Good'
-                      : '',
-              style: getBody().copyWith(fontSize: 14),
-            )
+            // Text(
+            //   title == 'N/A'
+            //       ? ''
+            //       : title == 'Good'
+            //           ? '🔵 Good'
+            //           : '',
+            //   style: getBody().copyWith(fontSize: 14),
+            // )
+            if (title != 'N/A')
+              Text(
+                title,
+                style: getBody().copyWith(fontSize: 14),
+              )
           ],
         ),
         //? Time
