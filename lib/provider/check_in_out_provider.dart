@@ -20,11 +20,37 @@ class CheckInOutProvider with ChangeNotifier {
 
   final double fixedLatitude = 13.350918350149795;
   final double fixedLongitude = 103.86433962916841;
-  final double allowedRange = 50.0;
+  final double allowedRange = 2.0;
 
   // Method to set the shiftStatus and notify listeners
   void setShiftStatus(String status) {
     _shiftStatus = status;
+    notifyListeners();
+  }
+
+  // Method to check if the user is within the allowed range
+  Future<bool> isUserWithinAllowedRange() async {
+    try {
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      double distanceInMeters = Geolocator.distanceBetween(
+          position.latitude, position.longitude, fixedLatitude, fixedLongitude);
+
+      return distanceInMeters <= allowedRange;
+    } catch (e) {
+      _errorMessage = 'Error checking location: $e';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  void setLoading(bool isLoading) {
+    _isLoading = isLoading;
+    notifyListeners();
+  }
+
+  void setErrorMessage(String? message) {
+    _errorMessage = message;
     notifyListeners();
   }
 
@@ -131,12 +157,19 @@ class CheckInOutProvider with ChangeNotifier {
         return;
       }
 
-      final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      double distanceInMeters = Geolocator.distanceBetween(
-          position.latitude, position.longitude, fixedLatitude, fixedLongitude);
+      // final position = await Geolocator.getCurrentPosition(
+      //     desiredAccuracy: LocationAccuracy.high);
+      // double distanceInMeters = Geolocator.distanceBetween(
+      //     position.latitude, position.longitude, fixedLatitude, fixedLongitude);
 
-      if (distanceInMeters > allowedRange) {
+      // if (distanceInMeters > allowedRange) {
+      //   _errorMessage = 'You are not within the allowed range for check-in.';
+      //   notifyListeners();
+      //   return;
+      // }
+
+      bool isWithinRange = await isUserWithinAllowedRange();
+      if (!isWithinRange) {
         _errorMessage = 'You are not within the allowed range for check-in.';
         notifyListeners();
         return;

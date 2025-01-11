@@ -240,7 +240,22 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
 
         final provider =
             Provider.of<CheckInOutProvider>(context, listen: false);
+        // Ensure the user is within the allowed range before proceeding
+        bool isInAllowedRange = await provider.isUserWithinAllowedRange();
+        if (!isInAllowedRange) {
+          provider.setErrorMessage(
+              "You are not within the allowed range for check-in.");
+          if (mounted) {
+            Future.delayed(const Duration(milliseconds: 300), () {
+              Navigator.pop(context);
+            });
+          }
 
+          isProcessing = false;
+          return;
+        }
+
+        // Proceed with check-in/check-out logic
         await provider.checkInOut(scanData.code!, reason: widget.reason);
 
         if (provider.errorMessage != null) {

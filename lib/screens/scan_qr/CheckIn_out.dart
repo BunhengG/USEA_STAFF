@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:usea_staff_test/Components/custom_appbar_widget.dart';
 import 'package:usea_staff_test/constant/constant.dart';
 import 'package:provider/provider.dart';
+import '../../Components/custom_snackbar.dart';
 import '../../helper/shared_pref_helper.dart';
 import '../../provider/check_in_out_provider.dart';
 import 'OpenMap.dart';
 import 'scanQr_screen.dart';
 import 'widget/bottom_sheet_reason.dart';
+import 'widget/digital_clock.dart';
 import 'widget/shift_details.dart';
 
 class CheckInAndOutRecord extends StatefulWidget {
@@ -111,6 +113,20 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
     );
   }
 
+  void _openMap() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OpenMap(),
+        ),
+      );
+    });
+  }
+
+  final String errorAllowRange =
+      "You are not within the allowed range for check-in.";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,45 +142,51 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
             );
           }
 
-          if (provider.errorMessage != null) {
-            return Center(
-              child: Text(
-                provider.errorMessage!,
-                style: const TextStyle(color: uAtvColor, fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
-
           Color buttonColor;
           String buttonText;
           VoidCallback? onTap;
 
-          switch (provider.shiftStatus) {
-            case 'checkIn':
-              buttonColor = checkIn;
-              buttonText = 'Check In';
-              onTap = () => _showReasonCheckIn(context);
-              break;
-            case 'checkOut':
-              buttonColor = checkOut;
-              buttonText = 'Check Out';
-              onTap = () => _showReasonCheckOut(context);
-              break;
-            case 'disabled':
-              buttonColor = placeholderColor;
-              buttonText = 'Disabled';
-              onTap = null;
-              break;
-            default:
-              buttonColor = anvColor;
-              buttonText = 'Unknown';
-              onTap = null;
+          // Button logic based on shift status and allowed range
+          if (provider.errorMessage == errorAllowRange) {
+            showCustomSnackbar(
+              context,
+              message: errorAllowRange,
+              backgroundColor: atvColor,
+              icon: Icons.error,
+            );
+            // User is outside the allowed range, show "Open Map"
+            buttonColor = primaryColor;
+            buttonText = 'Open Map';
+            onTap = _openMap;
+          } else {
+            // User is within the allowed range, show "Check In" or "Check Out"
+            switch (provider.shiftStatus) {
+              case 'checkIn':
+                buttonColor = checkIn;
+                buttonText = 'Check In';
+                onTap = () => _showReasonCheckIn(context);
+                break;
+              case 'checkOut':
+                buttonColor = checkOut;
+                buttonText = 'Check Out';
+                onTap = () => _showReasonCheckOut(context);
+                break;
+              case 'disabled':
+                buttonColor = placeholderColor;
+                buttonText = 'Disabled';
+                onTap = null;
+                break;
+              default:
+                buttonColor = anvColor;
+                buttonText = 'Unknown';
+                onTap = null;
+            }
           }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Display shift details and other widgets
               Container(
                 padding: const EdgeInsets.all(mdPadding),
                 decoration: BoxDecoration(
@@ -172,56 +194,50 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                   color: secondaryColor,
                   borderRadius: BorderRadius.circular(roundedCornerSM),
                 ),
-                child: Stack(
+                child: const Column(
                   children: [
-                    const ShiftDetailsWidget(),
-                    const SizedBox(height: defaultPadding),
-                    if (provider.shiftStatus != 'disabled')
-                      Positioned(
-                        top: smMargin - 6,
-                        right: smMargin - 6,
-                        child: GestureDetector(
-                          onTap: onTap,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: mdMargin + 4,
-                              vertical: mdPadding,
-                            ),
-                            decoration: BoxDecoration(
-                              color: buttonColor,
-                              borderRadius:
-                                  BorderRadius.circular(roundedCornerSM - 2),
-                            ),
-                            child: Text(buttonText, style: getWhiteSubTitle()),
-                          ),
-                        ),
-                      ),
+                    ShiftDetailsWidget(),
+                    SizedBox(height: defaultPadding),
                   ],
                 ),
               ),
               const SizedBox(height: defaultPadding),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OpenMap(),
+
+              // Display the button based on the current state
+              if (provider.shiftStatus != 'disabled')
+                GestureDetector(
+                  onTap: onTap,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: provider.errorMessage == errorAllowRange
+                          ? backgroundColor
+                          : buttonColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        provider.errorMessage == errorAllowRange
+                            ? const BoxShadow(color: Colors.transparent)
+                            : shadowLg
+                      ],
                     ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: mdPadding),
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(roundedCornerSM),
-                  ),
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    'Open Map',
-                    style: getWhiteSubTitle(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          textAlign: TextAlign.center,
+                          buttonText,
+                          style: provider.errorMessage == errorAllowRange
+                              ? getSubTitle().copyWith(color: primaryColor)
+                              : getWhiteSubTitle(),
+                        ),
+                        if (provider.errorMessage != errorAllowRange)
+                          const DigitalClock(),
+                      ],
+                    ),
                   ),
                 ),
-              )
             ],
           );
         }),
