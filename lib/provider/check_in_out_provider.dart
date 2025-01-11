@@ -20,37 +20,11 @@ class CheckInOutProvider with ChangeNotifier {
 
   final double fixedLatitude = 13.350918350149795;
   final double fixedLongitude = 103.86433962916841;
-  final double allowedRange = 2.0;
+  final double allowedRange = 50.0;
 
   // Method to set the shiftStatus and notify listeners
   void setShiftStatus(String status) {
     _shiftStatus = status;
-    notifyListeners();
-  }
-
-  // Method to check if the user is within the allowed range
-  Future<bool> isUserWithinAllowedRange() async {
-    try {
-      final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      double distanceInMeters = Geolocator.distanceBetween(
-          position.latitude, position.longitude, fixedLatitude, fixedLongitude);
-
-      return distanceInMeters <= allowedRange;
-    } catch (e) {
-      _errorMessage = 'Error checking location: $e';
-      notifyListeners();
-      return false;
-    }
-  }
-
-  void setLoading(bool isLoading) {
-    _isLoading = isLoading;
-    notifyListeners();
-  }
-
-  void setErrorMessage(String? message) {
-    _errorMessage = message;
     notifyListeners();
   }
 
@@ -131,6 +105,26 @@ class CheckInOutProvider with ChangeNotifier {
     }
   }
 
+  // New getter for checking if the check-out is early
+  bool get shouldShowCheckOutReason {
+    final currentTime = DateTime.now();
+    final hour = currentTime.hour;
+    final minute = currentTime.minute;
+
+    // First shift: Check if it's before 12:00 PM
+    if (hour < 12 || (hour == 12 && minute == 0)) {
+      return true;
+    }
+
+    // Second shift: Check if it's before 5:00 PM
+    if (hour < 17 || (hour == 17 && minute == 0)) {
+      return true;
+    }
+
+    // If neither condition is met, return false
+    return false;
+  }
+
   Future<void> checkInOut(String qrCode, {required String reason}) async {
     if (!qrCode.startsWith('usea') || qrCode.length < 7) {
       _errorMessage = 'Invalid QR code format.';
@@ -157,29 +151,43 @@ class CheckInOutProvider with ChangeNotifier {
         return;
       }
 
-      // final position = await Geolocator.getCurrentPosition(
-      //     desiredAccuracy: LocationAccuracy.high);
-      // double distanceInMeters = Geolocator.distanceBetween(
-      //     position.latitude, position.longitude, fixedLatitude, fixedLongitude);
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      double distanceInMeters = Geolocator.distanceBetween(
+          position.latitude, position.longitude, fixedLatitude, fixedLongitude);
 
-      // if (distanceInMeters > allowedRange) {
-      //   _errorMessage = 'You are not within the allowed range for check-in.';
-      //   notifyListeners();
-      //   return;
-      // }
-
-      bool isWithinRange = await isUserWithinAllowedRange();
-      if (!isWithinRange) {
+      if (distanceInMeters > allowedRange) {
         _errorMessage = 'You are not within the allowed range for check-in.';
         notifyListeners();
         return;
       }
 
-      // Validate reason for early check-out (if applicable)
-      if (_shiftStatus == 'checkOut' && reason.trim().isEmpty) {
-        _errorMessage = 'Reason is required for early check-out.';
-        notifyListeners();
-        return;
+      // Validate early check-out and show modal for reasons only if necessary
+      if (_shiftStatus == 'checkOut') {
+        if (_shiftType == 'firstShift' &&
+            DateFormat('HH:mm')
+                .parse(checkOutTime)
+                .isBefore(DateFormat('12:00').parse('12:00'))) {
+          // Show modal for reason if check-out is before 12:00 PM
+          if (reason.trim().isEmpty) {
+            _errorMessage = 'Reason is required for early check-out.';
+            notifyListeners();
+            return;
+          }
+        } else if (_shiftType == 'secondShift' &&
+            DateFormat('HH:mm')
+                .parse(checkOutTime)
+                .isBefore(DateFormat('17:00').parse('17:00'))) {
+          // Show modal for reason if check-out is before 5:00 PM
+          if (reason.trim().isEmpty) {
+            _errorMessage = 'Reason is required for early check-out.';
+            notifyListeners();
+            return;
+          }
+        } else {
+          // No reason modal needed for normal check-out times
+          _errorMessage = null;
+        }
       }
 
       // Validate shift type for check-in/out
@@ -193,6 +201,7 @@ class CheckInOutProvider with ChangeNotifier {
         "checkOutTime": checkOutTime,
         "reason": reason,
       };
+
       // print("Sending request: $requestBody");
 
       var response = await http.post(
