@@ -15,6 +15,8 @@ const backgroundShape = Color(0xFFE5E5E5);
 const hbdColor = Color(0xFF720000);
 const anvColor = Color(0xFF004297);
 const atvColor = Color(0xFF16C47F);
+const checkIn = Color(0xFF4CD964);
+const checkOut = Colors.orange;
 const uAtvColor = Color(0xFFF72C5B);
 const uAtvShape = Color.fromARGB(255, 213, 228, 243);
 

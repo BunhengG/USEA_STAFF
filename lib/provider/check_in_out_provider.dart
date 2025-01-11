@@ -142,6 +142,13 @@ class CheckInOutProvider with ChangeNotifier {
         return;
       }
 
+      // Validate reason for early check-out (if applicable)
+      if (_shiftStatus == 'checkOut' && reason.trim().isEmpty) {
+        _errorMessage = 'Reason is required for early check-out.';
+        notifyListeners();
+        return;
+      }
+
       // Validate shift type for check-in/out
       String shift =
           (_shiftType == 'firstShift') ? 'firstShift' : 'secondShift';
@@ -153,7 +160,6 @@ class CheckInOutProvider with ChangeNotifier {
         "checkOutTime": checkOutTime,
         "reason": reason,
       };
-
       // print("Sending request: $requestBody");
 
       var response = await http.post(
