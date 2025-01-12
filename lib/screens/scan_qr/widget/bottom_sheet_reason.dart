@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:reorderable_grid_view/reorderable_grid_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constant/constant.dart';
 
@@ -25,10 +29,13 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
   final TextEditingController reasonController = TextEditingController();
   bool _isSubmitEnabled = false;
   bool _isExpanded = false;
+  late List<String> mutableReasons;
 
   @override
   void initState() {
     super.initState();
+    mutableReasons = List.from(widget.reasons);
+    _loadIndicesFromPreferences();
 
     // Listen the text field
     reasonController.addListener(() {
@@ -36,6 +43,25 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
         _isSubmitEnabled = reasonController.text.trim().isNotEmpty;
       });
     });
+  }
+
+  Future<void> _loadIndicesFromPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedIndicesJson = prefs.getString('saved_indices');
+    if (savedIndicesJson != null) {
+      final savedIndices = List<int>.from(jsonDecode(savedIndicesJson));
+      setState(() {
+        mutableReasons =
+            savedIndices.map((index) => widget.reasons[index]).toList();
+      });
+    }
+  }
+
+  Future<void> _saveIndicesToPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final indices =
+        mutableReasons.map((reason) => widget.reasons.indexOf(reason)).toList();
+    await prefs.setString('saved_indices', jsonEncode(indices));
   }
 
   @override
@@ -112,61 +138,41 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
     );
   }
 
-  // Widget _buildReasons() {
-  //   return AnimatedCrossFade(
-  //     firstChild: Wrap(
-  //       spacing: 8.0,
-  //       runSpacing: 8.0,
-  //       children: widget.reasons.take(3).map((reason) {
-  //         return _buildReasonButton(reason);
-  //       }).toList(),
-  //     ),
-  //     secondChild: Wrap(
-  //       spacing: 8.0,
-  //       runSpacing: 8.0,
-  //       children: widget.reasons.map((reason) {
-  //         return _buildReasonButton(reason);
-  //       }).toList(),
-  //     ),
-  //     crossFadeState:
-  //         _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-  //     duration: const Duration(milliseconds: 300),
-  //   );
-  // }
-
   Widget _buildReasons() {
     return AnimatedCrossFade(
-      firstChild: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-          childAspectRatio: 2.5,
-        ),
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: widget.reasons.take(3).length,
-        itemBuilder: (context, index) {
-          return _buildReasonButton(widget.reasons[index]);
-        },
-      ),
-      secondChild: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-          childAspectRatio: 2.5,
-        ),
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: widget.reasons.length,
-        itemBuilder: (context, index) {
-          return _buildReasonButton(widget.reasons[index]);
-        },
-      ),
+      firstChild: _buildReorderableGrid(3),
+      secondChild: _buildReorderableGrid(mutableReasons.length),
       crossFadeState:
           _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
       duration: const Duration(milliseconds: 300),
+    );
+  }
+
+  Widget _buildReorderableGrid(int itemCount) {
+    return ReorderableGridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+        childAspectRatio: 2.5,
+      ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        return KeyedSubtree(
+          key: ValueKey(mutableReasons[index]),
+          child: _buildReasonButton(mutableReasons[index]),
+        );
+      },
+      onReorder: (oldIndex, newIndex) async {
+        setState(() {
+          if (newIndex > oldIndex) newIndex -= 1;
+          final item = mutableReasons.removeAt(oldIndex);
+          mutableReasons.insert(newIndex, item);
+        });
+        await _saveIndicesToPreferences();
+      },
     );
   }
 
@@ -255,7 +261,7 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             reason,
-            style: getSubTitle().copyWith(fontSize: 13),
+            style: getBody().copyWith(fontWeight: FontWeight.w400),
           ),
         ),
       ),

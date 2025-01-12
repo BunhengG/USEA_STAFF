@@ -38,6 +38,19 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
     });
   }
 
+  final checkInReasons = [
+    'Sorry I\'m late.',
+    'អ៊ីនធឺណិតយឺត',
+    'បញ្ហាសុខភាព',
+    'អាកាសធាតុ',
+    'រថយន្តខូច',
+    'ភ្លេច Check-in',
+    'ភ្លេចទូរស័ព្ទ',
+    'ស្ទះផ្លូវ',
+    'ជួបគ្រោះថ្នាក់',
+    'រលុតទូរស័ព្ទ',
+  ];
+
   void _showReasonCheckIn(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -46,18 +59,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
         return ReasonBottomSheet(
           title: 'Why are you late?',
           subtitle: 'Please fill or select a reason.',
-          reasons: const [
-            'Sorry I\'m late.',
-            'អ៊ីនធឺណិតយឺត',
-            'បញ្ហាសុខភាព',
-            'អាកាសធាតុ',
-            'រថយន្តខូច',
-            'ភ្លេច Check-in',
-            'ភ្លេចទូរស័ព្ទ',
-            'ស្ទះផ្លូវ',
-            'ជួបគ្រោះថ្នាក់',
-            'រលុតទូរស័ព្ទ',
-          ],
+          reasons: checkInReasons,
           onReasonSubmitted: (reason) {
             Navigator.push(
               context,
@@ -81,6 +83,14 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
     );
   }
 
+  final checkOutReason = [
+    'ចុះទៅខេត្តបន្ទាន់',
+    'ណាត់ជួបគ្រូពេទ្យ',
+    'អត់ស្រួលខ្លួន',
+    'មានរឿងបន្ទាន់',
+    'ធ្វើឯកសារបន្ទាន់',
+  ];
+
   void _showReasonCheckOut(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -89,13 +99,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
         return ReasonBottomSheet(
           title: 'Why are you leaving early?',
           subtitle: 'Please fill or select a reason.',
-          reasons: const [
-            'ចុះទៅខេត្តបន្ទាន់',
-            'ណាត់ជួបគ្រូពេទ្យ',
-            'អត់ស្រួលខ្លួន',
-            'មានរឿងបន្ទាន់',
-            'ធ្វើឯកសារបន្ទាន់',
-          ],
+          reasons: checkOutReason,
           onReasonSubmitted: (reason) {
             Navigator.push(
               context,
