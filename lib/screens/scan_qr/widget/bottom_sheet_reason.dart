@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../constant/constant.dart';
@@ -62,7 +61,7 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
             _buildReasons(),
             // expend
             if (widget.reasons.length > 2)
-              _buildSeeMoreLessButton('See More', 'See Less'),
+              _buildSeeMoreLessButton('See Less', 'See More'),
             // Submit
             _buildButtonSubmit('Submit'),
             const SizedBox(height: defaultPadding * 1.2),
@@ -98,9 +97,11 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
           border: const OutlineInputBorder(),
           contentPadding: const EdgeInsets.all(mdPadding),
           enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: primaryColor, width: 1.0),
+            borderRadius: BorderRadius.all(Radius.circular(roundedCornerSM)),
+            borderSide: BorderSide(color: primaryColor, width: 1.5),
           ),
           focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(roundedCornerSM)),
             borderSide: BorderSide(color: primaryColor, width: 2.0),
           ),
         ),
@@ -111,21 +112,57 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
     );
   }
 
+  // Widget _buildReasons() {
+  //   return AnimatedCrossFade(
+  //     firstChild: Wrap(
+  //       spacing: 8.0,
+  //       runSpacing: 8.0,
+  //       children: widget.reasons.take(3).map((reason) {
+  //         return _buildReasonButton(reason);
+  //       }).toList(),
+  //     ),
+  //     secondChild: Wrap(
+  //       spacing: 8.0,
+  //       runSpacing: 8.0,
+  //       children: widget.reasons.map((reason) {
+  //         return _buildReasonButton(reason);
+  //       }).toList(),
+  //     ),
+  //     crossFadeState:
+  //         _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+  //     duration: const Duration(milliseconds: 300),
+  //   );
+  // }
+
   Widget _buildReasons() {
     return AnimatedCrossFade(
-      firstChild: Wrap(
-        spacing: 8.0,
-        runSpacing: 8.0,
-        children: widget.reasons.take(2).map((reason) {
-          return _buildReasonButton(reason);
-        }).toList(),
+      firstChild: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+          childAspectRatio: 2.5,
+        ),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: widget.reasons.take(3).length,
+        itemBuilder: (context, index) {
+          return _buildReasonButton(widget.reasons[index]);
+        },
       ),
-      secondChild: Wrap(
-        spacing: 8.0,
-        runSpacing: 8.0,
-        children: widget.reasons.map((reason) {
-          return _buildReasonButton(reason);
-        }).toList(),
+      secondChild: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+          childAspectRatio: 2.5,
+        ),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: widget.reasons.length,
+        itemBuilder: (context, index) {
+          return _buildReasonButton(widget.reasons[index]);
+        },
       ),
       crossFadeState:
           _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
@@ -212,9 +249,14 @@ class _ReasonBottomSheetState extends State<ReasonBottomSheet> {
           color: uAtvShape,
           borderRadius: BorderRadius.circular(roundedCornerSM - 4),
         ),
-        child: Text(
-          reason,
-          style: getBody(),
+        child: Center(
+          child: Text(
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            reason,
+            style: getSubTitle().copyWith(fontSize: 13),
+          ),
         ),
       ),
     );
