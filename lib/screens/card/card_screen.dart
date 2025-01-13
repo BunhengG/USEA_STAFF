@@ -203,6 +203,40 @@ class _CardScreenState extends State<CardScreen> {
                       ],
                     ),
                   ),
+                  Column(
+                    children: [
+                      Text(
+                        'Expiry Date: December 31, 2025',
+                        style: getSubTitle().copyWith(color: uAtvColor),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 14.0, top: 8.0),
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Text(
+                            '0383USEA/FT',
+                            style:
+                                getBody().copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      CachedNetworkImage(
+                        imageUrl:
+                            'https://img.freepik.com/free-psd/barcode-illustration-isolated_23-2150584086.jpg?t=st=1736736611~exp=1736740211~hmac=c1821832cf60c9ec6abde0ec4c475fd8b89091462e9f507f81edb71bb6976782&w=1380',
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        fit: BoxFit.cover,
+                        height: 100,
+                        width: double.infinity,
+                      ),
+                      const SizedBox(height: defaultMargin * 2)
+                    ],
+                  ),
                 ],
               );
             }),
