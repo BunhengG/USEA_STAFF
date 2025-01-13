@@ -177,21 +177,21 @@ class _CalendarScreenState extends State<CalendarScreen>
                           children: [
                             Text(
                               'Workday',
-                              style: getTitle().copyWith(
+                              style: getSubTitle().copyWith(
                                 fontSize: 16,
                                 color: anvColor,
                               ),
                             ),
                             Text(
                               '\t\t / \t\t',
-                              style: getTitle().copyWith(
+                              style: getSubTitle().copyWith(
                                 fontSize: 16,
                                 color: anvColor,
                               ),
                             ),
                             Text(
                               'Time',
-                              style: getTitle().copyWith(
+                              style: getSubTitle().copyWith(
                                 fontSize: 16,
                                 color: anvColor,
                               ),
@@ -205,7 +205,9 @@ class _CalendarScreenState extends State<CalendarScreen>
                           children: [
                             Text(
                               calendar.date.toLocal().toString().split(' ')[0],
-                              style: getSubTitle(),
+                              style: getSubTitle().copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             const SizedBox(width: mdPadding),
                             Column(
@@ -215,6 +217,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                   '\t\t ${calendar.morningTime} AM',
                                   style: getSubTitle().copyWith(
                                     color: textColor,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 Padding(
@@ -223,17 +226,15 @@ class _CalendarScreenState extends State<CalendarScreen>
                                   ),
                                   child: Container(
                                     width: 50.0,
-                                    height: 2.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.amber.withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
+                                    height: 1.0,
+                                    color: placeholderColor,
                                   ),
                                 ),
                                 Text(
                                   '\t\t ${calendar.afternoonTime} PM',
                                   style: getSubTitle().copyWith(
                                     color: textColor,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
@@ -249,7 +250,8 @@ class _CalendarScreenState extends State<CalendarScreen>
           ),
         );
       },
-      separatorBuilder: (context, index) => const SizedBox(height: mdPadding),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: mdPadding - 4),
     );
   }
 
@@ -273,25 +275,40 @@ class _CalendarScreenState extends State<CalendarScreen>
               borderRadius: BorderRadius.circular(roundedCornerSM),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.all(mdPadding),
-              leading:
-                  const Text('🎉', style: TextStyle(fontSize: titleSize + 4)),
-              title: Text(
-                holiday['date'] ?? 'Unnamed Date',
-                style: getTitle(),
+              contentPadding: const EdgeInsets.only(
+                left: defaultPadding * 1.5,
+                bottom: mdPadding,
+                top: mdPadding,
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${holiday['name'] ?? 'Unknown Holiday'}',
-                    style: getSubTitle(),
-                  ),
-                  Text(
-                    '${holiday['description'] ?? 'Unknown Description'}',
-                    style: getBody(),
-                  ),
-                ],
+              leading: const Text(
+                '🎉',
+                style: TextStyle(fontSize: titleSize + 4),
+              ),
+              title: Padding(
+                padding: const EdgeInsets.only(
+                  left: smPadding,
+                  bottom: smPadding - 2,
+                ),
+                child: Text(
+                  holiday['date'] ?? 'Unnamed Date',
+                  style: getTitle(),
+                ),
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(left: smPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${holiday['name'] ?? 'Unknown Holiday'}',
+                      style: getSubTitle(),
+                    ),
+                    Text(
+                      '${holiday['description'] ?? 'Unknown Description'}',
+                      style: getBody(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
