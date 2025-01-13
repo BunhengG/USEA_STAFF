@@ -23,10 +23,11 @@ class _DigitalClockState extends State<DigitalClock> {
   @override
   Widget build(BuildContext context) {
     DateTime dateTime = DateTime.now();
-    final format = DateFormat('hh:mm:ss a');
+    // final format = DateFormat('hh:mm:ss a');
+    final format = DateFormat('hh:mm a');
     return Text(
       format.format(dateTime),
-      style: getWhiteSubTitle().copyWith(fontSize: 14),
+      style: getWhiteSubTitle().copyWith(fontSize: 18),
     );
   }
 }

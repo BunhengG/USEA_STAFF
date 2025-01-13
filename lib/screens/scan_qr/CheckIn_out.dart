@@ -163,7 +163,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
             switch (provider.shiftStatus) {
               case 'checkIn':
                 buttonColor = checkIn;
-                buttonText = 'Check-In';
+                buttonText = 'Check-in';
 
                 if (provider.shouldShowCheckInReason) {
                   onTap = () => _showReasonCheckIn(context);
@@ -173,7 +173,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                 break;
               case 'checkOut':
                 buttonColor = checkOut;
-                buttonText = 'Check-Out';
+                buttonText = 'Check-out';
 
                 if (provider.shouldShowCheckOutReason) {
                   onTap = () => _showReasonCheckOut(context);
