@@ -22,14 +22,28 @@ class CheckInOutProvider with ChangeNotifier {
   final double fixedLongitude = 103.86433962916841;
   final double allowedRange = 50.0;
 
+  // Initialize time zones
+  late tz.Location phnomPenh;
+
+  CheckInOutProvider() {
+    initializeTimeZones();
+    phnomPenh = tz.getLocation('Asia/Phnom_Penh');
+  }
+
   // Method to set the shiftStatus and notify listeners
   void setShiftStatus(String status) {
     _shiftStatus = status;
     notifyListeners();
   }
 
-  // ? Start with New Day
+  // Helper method to get the current date formatted
+  String getCurrentDateFormatted() {
+    final DateTime now = DateTime.now();
+    final String formattedDate = DateFormat('dd MMMM yyyy').format(now);
+    return formattedDate;
+  }
 
+  //NOTE: Update button state based on current time and shift
   Future<void> updateButtonState(String currentTime, String userId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -42,12 +56,6 @@ class CheckInOutProvider with ChangeNotifier {
         return;
       }
 
-      String getCurrentDateFormatted() {
-        final DateTime now = DateTime.now();
-        final String formattedDate = DateFormat('dd MMMM yyyy').format(now);
-        return formattedDate;
-      }
-
       final currentDate = getCurrentDateFormatted();
       final encodedUserId = Uri.encodeComponent(userId);
 
@@ -57,39 +65,40 @@ class CheckInOutProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
-        final shiftData = data[0]; // Assuming only one shift record
-        final shiftRecord = shiftData['shiftRecord']; // Access shiftRecord
-
+        final shiftData = data[0];
+        final shiftRecord = shiftData['shiftRecord'];
         final firstShift = shiftRecord['firstShift'];
         final secondShift = shiftRecord['secondShift'];
 
-        // Set shift type directly from the backend data
         _shiftType = shiftData['shift'];
 
-        // Get today's date to compare with the fetched shift data
-        DateTime now = DateTime.now();
+        tz.TZDateTime now = tz.TZDateTime.now(phnomPenh);
         String currentDateString = DateFormat('dd MMMM yyyy').format(now);
         String shiftDateString = shiftData['date'];
 
-        // Reset shift status if it's a new day
         if (currentDateString != shiftDateString) {
           _shiftStatus = 'checkIn';
         } else {
-          // Existing shift logic
           if (firstShift['checkIn'] == null) {
-            _shiftStatus = 'checkIn'; // First shift, show check-in
+            _shiftStatus = 'checkIn';
           } else if (firstShift['checkIn'] != null &&
               firstShift['checkOut'] == null) {
-            _shiftStatus = 'checkOut'; // First shift, show check-out
+            _shiftStatus = 'checkOut';
           } else if (firstShift['checkOut'] != null &&
               secondShift['checkIn'] == null) {
-            _shiftStatus = 'checkIn'; // Second shift, show check-in
-          } else if (secondShift['checkIn'] != null &&
+            _shiftStatus = 'checkIn';
+          } else if (firstShift['checkOut'] != null &&
+              secondShift['checkIn'] != null &&
               secondShift['checkOut'] == null) {
-            _shiftStatus = 'checkOut'; // Second shift, show check-out
+            _shiftStatus = 'checkOut';
           } else {
             _shiftStatus = 'disabled';
+          }
+
+          // Check if first shift checkout is null, disable second shift operations
+          if (firstShift['checkOut'] == null) {
+            _shiftStatus =
+                'disabled'; // Disable second shift if first shift is incomplete
           }
         }
 
@@ -105,17 +114,17 @@ class CheckInOutProvider with ChangeNotifier {
     }
   }
 
-//! checking if the check-In is late
+  //* Checking if check-in is late
   bool get shouldShowCheckInReason {
-    final currentTime = DateTime.now();
+    tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
 
     // Define first shift start time
-    final firstShiftStart = DateTime(
-        currentTime.year, currentTime.month, currentTime.day, 7, 0); // 07:00 AM
+    tz.TZDateTime firstShiftStart = tz.TZDateTime(phnomPenh, currentTime.year,
+        currentTime.month, currentTime.day, 7, 0); // 07:00 AM
 
     // Define second shift start time
-    final secondShiftStart = DateTime(currentTime.year, currentTime.month,
-        currentTime.day, 14, 0); // 02:00 PM
+    tz.TZDateTime secondShiftStart = tz.TZDateTime(phnomPenh, currentTime.year,
+        currentTime.month, currentTime.day, 14, 0); // 02:00 PM
 
     // Check if it's late for the first shift
     if (currentTime.isAfter(firstShiftStart) &&
@@ -129,52 +138,40 @@ class CheckInOutProvider with ChangeNotifier {
       return true;
     }
 
-    // If neither condition is met, no reason is required
     return false;
   }
 
-  //! checking if the check-out is early
+  //* Checking if check-out is early
+// Checking if check-out is early and requiring reason during specified times
   bool get shouldShowCheckOutReason {
-    final currentTime = DateTime.now();
+    tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
 
-    // Define first shift boundaries
-    final firstShiftStart = DateTime(
-        currentTime.year, currentTime.month, currentTime.day, 7, 0); // 07:00 AM
-    final firstShiftEnd = DateTime(currentTime.year, currentTime.month,
-        currentTime.day, 12, 0); // 12:00 PM
+    // Define first shift boundaries (in local time)
+    tz.TZDateTime firstShiftStart = tz.TZDateTime(phnomPenh, currentTime.year,
+        currentTime.month, currentTime.day, 7, 0); // 07:00 AM
+    tz.TZDateTime firstShiftEnd = tz.TZDateTime(phnomPenh, currentTime.year,
+        currentTime.month, currentTime.day, 12, 0); // 12:00 PM
 
-    // Define second shift boundaries
-    final secondShiftStart = DateTime(currentTime.year, currentTime.month,
-        currentTime.day, 14, 0); // 02:00 PM
-    final secondShiftEnd = DateTime(currentTime.year, currentTime.month,
-        currentTime.day, 17, 0); // 05:00 PM
+    // Define second shift boundaries (in local time)
+    tz.TZDateTime secondShiftStart = tz.TZDateTime(phnomPenh, currentTime.year,
+        currentTime.month, currentTime.day, 14, 0); // 02:00 PM
+    tz.TZDateTime secondShiftEnd = tz.TZDateTime(phnomPenh, currentTime.year,
+        currentTime.month, currentTime.day, 17, 0); // 05:00 PM
 
-    // If it's past the first shift's end time, no reason is required
-    if (currentTime.isAfter(firstShiftEnd)) {
-      return false;
-    }
-
-    // If it's past the second shift's end time, no reason is required
-    if (currentTime.isAfter(secondShiftEnd)) {
-      return false;
-    }
-
-    // Check for early check-out during the first shift
+    // Check for early check-out reasons
     if (currentTime.isAfter(firstShiftStart) &&
         currentTime.isBefore(firstShiftEnd)) {
-      return true;
+      return true; // Reason required if check-out is between 7:00 AM and 12:00 PM
     }
-
-    // Check for early check-out during the second shift
     if (currentTime.isAfter(secondShiftStart) &&
         currentTime.isBefore(secondShiftEnd)) {
-      return true;
+      return true; // Reason required if check-out is between 2:00 PM and 5:00 PM
     }
 
-    // If neither condition is met, no reason is required
     return false;
   }
 
+  //NOTE: Check in and out of the specified
   Future<void> checkInOut(String qrCode, {required String reason}) async {
     if (!qrCode.startsWith('usea') || qrCode.length < 7) {
       _errorMessage = 'Invalid QR code format.';
@@ -189,8 +186,7 @@ class CheckInOutProvider with ChangeNotifier {
     try {
       // for Phnom Penh
       initializeTimeZones();
-      final phnomPenh = tz.getLocation('Asia/Phnom_Penh');
-      final currentTime = tz.TZDateTime.now(phnomPenh);
+      tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
       String checkInTime = DateFormat('HH:mm:ss').format(currentTime);
       String checkOutTime = DateFormat('HH:mm:ss').format(currentTime);
 
@@ -214,29 +210,36 @@ class CheckInOutProvider with ChangeNotifier {
 
       // Validate early check-out and show modal for reasons only if necessary
       if (_shiftStatus == 'checkOut') {
-        if (_shiftType == 'firstShift' &&
-            DateFormat('HH:mm')
-                .parse(checkOutTime)
-                .isBefore(DateFormat('12:00').parse('12:00'))) {
-          // Show modal for reason if check-out is before 12:00 PM
-          if (reason.trim().isEmpty) {
-            _errorMessage = 'Reason is required for early check-out.';
+        if (_shiftType == 'firstShift') {
+          final checkOutTimeParsed = DateFormat('HH:mm').parse(checkOutTime);
+
+          // Check-out before 12:00 PM requires reason
+          if (checkOutTimeParsed.isBefore(DateFormat('HH:mm').parse('12:00'))) {
+            if (reason.trim().isEmpty) {
+              _errorMessage = 'Reason is required for early check-out.';
+              notifyListeners();
+              return;
+            }
+          }
+
+          // Check-out after 2:00 PM is invalid
+          if (checkOutTimeParsed.isAfter(DateFormat('HH:mm').parse('14:00'))) {
+            _errorMessage =
+                'First shift check-out is no longer allowed after 2:00 PM.';
             notifyListeners();
             return;
           }
-        } else if (_shiftType == 'secondShift' &&
-            DateFormat('HH:mm')
-                .parse(checkOutTime)
-                .isBefore(DateFormat('17:00').parse('17:00'))) {
-          // Show modal for reason if check-out is before 5:00 PM
-          if (reason.trim().isEmpty) {
-            _errorMessage = 'Reason is required for early check-out.';
-            notifyListeners();
-            return;
+        } else if (_shiftType == 'secondShift') {
+          final checkOutTimeParsed = DateFormat('HH:mm').parse(checkOutTime);
+
+          // Check-out before 5:00 PM requires reason
+          if (checkOutTimeParsed.isBefore(DateFormat('HH:mm').parse('17:00'))) {
+            if (reason.trim().isEmpty) {
+              _errorMessage = 'Reason is required for early check-out.';
+              notifyListeners();
+              return;
+            }
           }
-        } else {
-          // No reason modal needed for normal check-out times
-          _errorMessage = null;
         }
       }
 
