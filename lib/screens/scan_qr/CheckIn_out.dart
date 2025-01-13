@@ -196,7 +196,7 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(mdPadding),
+                  padding: const EdgeInsets.all(mdPadding + 6),
                   decoration: BoxDecoration(
                     boxShadow: const [shadowLg],
                     color: secondaryColor,
