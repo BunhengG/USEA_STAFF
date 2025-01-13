@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
@@ -51,8 +52,12 @@ class _MemberScreenState extends State<MemberScreen> {
       body: Column(
         children: [
           //* Search Bar
-          Padding(
-            padding: const EdgeInsets.all(defaultPadding),
+          Container(
+            color: backgroundColor,
+            padding: const EdgeInsets.symmetric(
+              horizontal: defaultPadding,
+              vertical: mdPadding,
+            ),
             child: TextField(
               cursorColor: primaryColor,
               autocorrect: true,
@@ -154,8 +159,17 @@ class _MemberScreenState extends State<MemberScreen> {
                                       child: CircleAvatar(
                                         radius: 23.5,
                                         backgroundColor: primaryColor,
-                                        child: Image.asset(
-                                          'assets/img/avator.png',
+                                        child: CachedNetworkImage(
+                                          imageUrl: member.image,
+                                          placeholder: (context, url) =>
+                                              const CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                          fit: BoxFit.cover,
                                           scale: 12,
                                         ),
                                       ),
@@ -201,7 +215,7 @@ class _MemberScreenState extends State<MemberScreen> {
                     );
                   },
                   separatorBuilder: (context, index) =>
-                      const SizedBox(height: mdMargin),
+                      const SizedBox(height: mdPadding),
                 );
               },
             ),

@@ -1,5 +1,6 @@
 class MemberItem {
   final int id;
+  final String image;
   final String name;
   final String position;
   final String department;
@@ -9,6 +10,7 @@ class MemberItem {
 
   MemberItem({
     required this.id,
+    required this.image,
     required this.name,
     required this.position,
     required this.department,
@@ -20,6 +22,7 @@ class MemberItem {
   factory MemberItem.fromJson(Map<String, dynamic> json) {
     return MemberItem(
       id: json['id'],
+      image: json['image'],
       name: json['name'],
       position: json['position'],
       department: json['department'],
@@ -32,6 +35,7 @@ class MemberItem {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'image': image,
       'name': name,
       'position': position,
       'department': department,

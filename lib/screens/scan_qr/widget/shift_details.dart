@@ -41,10 +41,10 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget> {
     final secondCheckOutTime = secondShift?.checkOut.time ?? 'N/A';
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: mdPadding),
       child: provider.isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: backgroundColor))
+              child: CircularProgressIndicator(color: backgroundColor),
+            )
           : provider.errorMessage != null
               ? Center(
                   child: Text(provider.errorMessage!, style: getSubTitle()),
@@ -65,7 +65,7 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget> {
                             dateShift,
                             style: getTitle().copyWith(fontSize: 16),
                           ),
-                          const SizedBox(height: defaultPadding * 2),
+                          const SizedBox(height: defaultPadding * 1.5),
 
                           // NOTE: 1st Check-in
                           _buildCheckIn(

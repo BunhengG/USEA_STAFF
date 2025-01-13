@@ -47,7 +47,9 @@ class _PermissionScreenState extends State<PermissionScreen> {
               // Show loading indicator
               if (permissionProvider.isLoading) {
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    color: backgroundColor,
+                  ),
                 );
               }
 
@@ -116,7 +118,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'PD ${permission.permissionDay}',
+                                        'D ${permission.permissionDay}',
                                         style: getTitle(),
                                       ),
 
