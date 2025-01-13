@@ -108,23 +108,27 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               firstCheckInTime,
                               firstCheckInStatus,
                             ),
-                            _buildCheckout(
-                              '1st Check-out : ',
-                              firstCheckOutTime,
-                              firstCheckOutStatus,
-                            ),
 
-                            // 2st
-                            _buildCheckIn(
-                              '2st Check-in : ',
-                              secondCheckInTime,
-                              secondCheckInStatus,
-                            ),
-                            _buildCheckout(
-                              '2st Check-out : ',
-                              secondCheckOutTime,
-                              secondCheckOutStatus,
-                            ),
+                            if (firstCheckInTime != 'N/A')
+                              _buildCheckout(
+                                '1st Check-out : ',
+                                firstCheckOutTime,
+                                firstCheckOutStatus,
+                              ),
+
+                            if (firstCheckOutTime != 'N/A')
+                              // 2st
+                              _buildCheckIn(
+                                '2st Check-in : ',
+                                secondCheckInTime,
+                                secondCheckInStatus,
+                              ),
+                            if (secondCheckInTime != 'N/A')
+                              _buildCheckout(
+                                '2st Check-out : ',
+                                secondCheckOutTime,
+                                secondCheckOutStatus,
+                              ),
                           ],
                         ),
                       ],

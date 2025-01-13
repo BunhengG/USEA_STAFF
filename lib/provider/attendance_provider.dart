@@ -102,8 +102,22 @@ class AttendanceProvider with ChangeNotifier {
 
   /// Helper: Parse JSON Data into AttendanceItems
   List<AttendanceItem> _parseAttendanceData(String responseBody) {
-    final List<dynamic> data = json.decode(responseBody);
-    return data.map((json) => AttendanceItem.fromJson(json)).toList();
+    try {
+      // Parse JSON response body
+      final List<dynamic> data = jsonDecode(responseBody);
+
+      // Map JSON to AttendanceItem and sort by date (newest to oldest)
+      return data.map((json) => AttendanceItem.fromJson(json)).toList()
+        ..sort((a, b) {
+          final DateTime dateA = DateFormat('dd MMMM yyyy').parse(a.date);
+          final DateTime dateB = DateFormat('dd MMMM yyyy').parse(b.date);
+          return dateB.compareTo(dateA);
+        });
+    } catch (error) {
+      // Log the error and return an empty list in case of failure
+      debugPrint('Error parsing attendance data: $error');
+      return [];
+    }
   }
 
   /// Get userId from SharedPreferences
