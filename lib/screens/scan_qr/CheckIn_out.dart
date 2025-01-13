@@ -38,6 +38,9 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
     });
   }
 
+  final firstShiftCheckOut = "12:00";
+  final secondShiftCheckOut = "5:00";
+
   final checkInReasons = [
     'Sorry I\'m late.',
     'អ៊ីនធឺណិតយឺត',
@@ -161,12 +164,17 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
               case 'checkIn':
                 buttonColor = checkIn;
                 buttonText = 'Check-In';
-                onTap = () => _showReasonCheckIn(context);
+
+                if (provider.shouldShowCheckInReason) {
+                  onTap = () => _showReasonCheckIn(context);
+                } else {
+                  provider.checkInOut("qrCode", reason: "");
+                }
                 break;
               case 'checkOut':
                 buttonColor = checkOut;
                 buttonText = 'Check-Out';
-                // If early check-out, show the modal for reason
+
                 if (provider.shouldShowCheckOutReason) {
                   onTap = () => _showReasonCheckOut(context);
                 } else {

@@ -105,23 +105,73 @@ class CheckInOutProvider with ChangeNotifier {
     }
   }
 
-  // New getter for checking if the check-out is early
+//! checking if the check-In is late
+  bool get shouldShowCheckInReason {
+    final currentTime = DateTime.now();
+
+    // Define first shift start time
+    final firstShiftStart = DateTime(
+        currentTime.year, currentTime.month, currentTime.day, 7, 0); // 07:00 AM
+
+    // Define second shift start time
+    final secondShiftStart = DateTime(currentTime.year, currentTime.month,
+        currentTime.day, 14, 0); // 02:00 PM
+
+    // Check if it's late for the first shift
+    if (currentTime.isAfter(firstShiftStart) &&
+        currentTime.isBefore(firstShiftStart.add(const Duration(hours: 5)))) {
+      return true;
+    }
+
+    // Check if it's late for the second shift
+    if (currentTime.isAfter(secondShiftStart) &&
+        currentTime.isBefore(secondShiftStart.add(const Duration(hours: 3)))) {
+      return true;
+    }
+
+    // If neither condition is met, no reason is required
+    return false;
+  }
+
+  //! checking if the check-out is early
   bool get shouldShowCheckOutReason {
     final currentTime = DateTime.now();
-    final hour = currentTime.hour;
-    final minute = currentTime.minute;
 
-    // First shift: Check if it's before 12:00 PM
-    if (hour < 12 || (hour == 12 && minute == 0)) {
+    // Define first shift boundaries
+    final firstShiftStart = DateTime(
+        currentTime.year, currentTime.month, currentTime.day, 7, 0); // 07:00 AM
+    final firstShiftEnd = DateTime(currentTime.year, currentTime.month,
+        currentTime.day, 12, 0); // 12:00 PM
+
+    // Define second shift boundaries
+    final secondShiftStart = DateTime(currentTime.year, currentTime.month,
+        currentTime.day, 14, 0); // 02:00 PM
+    final secondShiftEnd = DateTime(currentTime.year, currentTime.month,
+        currentTime.day, 17, 0); // 05:00 PM
+
+    // If it's past the first shift's end time, no reason is required
+    if (currentTime.isAfter(firstShiftEnd)) {
+      return false;
+    }
+
+    // If it's past the second shift's end time, no reason is required
+    if (currentTime.isAfter(secondShiftEnd)) {
+      return false;
+    }
+
+    // Check for early check-out during the first shift
+    if (currentTime.isAfter(firstShiftStart) &&
+        currentTime.isBefore(firstShiftEnd)) {
       return true;
     }
 
-    // Second shift: Check if it's before 5:00 PM
-    if (hour < 17 || (hour == 17 && minute == 0)) {
+    // Check for early check-out during the second shift
+    if (currentTime.isAfter(secondShiftStart) &&
+        currentTime.isBefore(secondShiftEnd)) {
       return true;
     }
 
-    // If neither condition is met, return false
+    // If neither condition is met, no reason is required
     return false;
   }
 
