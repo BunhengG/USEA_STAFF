@@ -29,7 +29,7 @@ class PermissionCardWidget extends StatelessWidget {
         ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: smPadding),
-          height: MediaQuery.of(context).size.height * 0.3,
+          height: MediaQuery.of(context).size.height * 0.25,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
