@@ -9,7 +9,7 @@ import '../../helper/shared_pref_helper.dart';
 import 'package:quickalert/quickalert.dart';
 
 import '../../provider/mycard_provider.dart';
-import 'widget/home_card.dart';
+import 'widget/profile_details_card.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -173,7 +173,7 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                       child: Container(
                                         width: double.infinity,
-                                        color: Colors.black45.withOpacity(0.1),
+                                        color: Colors.black45.withOpacity(0.0),
                                       ),
                                     ),
                                   ),
@@ -199,7 +199,11 @@ class ProfileScreen extends StatelessWidget {
                                       scale: 6,
                                     ),
                                   ),
-                                  _buildTextDetailsProfile('', card.name, 20),
+                                  _buildTextDetailsProfile(
+                                    '',
+                                    card.name,
+                                    20,
+                                  ),
                                   _buildTextDetailsProfile(
                                     'ID: ',
                                     card.userId,

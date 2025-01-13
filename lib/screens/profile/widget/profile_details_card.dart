@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constant/constant.dart';
-import '../../../provider/mycard_provider.dart';
+import '../../../provider/profileDetails_provider.dart';
 
 class WorkingPeriodSection extends StatefulWidget {
   const WorkingPeriodSection({super.key});
@@ -11,20 +11,46 @@ class WorkingPeriodSection extends StatefulWidget {
   State<WorkingPeriodSection> createState() => _WorkingPeriodSectionState();
 }
 
-class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
+class _WorkingPeriodSectionState extends State<WorkingPeriodSection>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize the animation controller
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500), // Adjust duration as needed
+      vsync: this, // TickerProviderStateMixin provides vsync
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
     // Fetch Card data when the screen loads
-    Provider.of<CardProvider>(context, listen: false).fetchCards();
+    Provider.of<ProfileProvider>(context, listen: false).fetchCards();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(0.0),
-      child: Consumer<CardProvider>(
+      child: Consumer<ProfileProvider>(
         builder: (context, workPeriodProvider, child) {
+          // Start fade-in animation once the data is loaded
+          if (!workPeriodProvider.isLoading) {
+            _controller.forward();
+          }
+
           // Show loading indicator
           if (workPeriodProvider.isLoading) {
             return const Center(
@@ -60,12 +86,8 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
             );
           }
 
-          return Container(
-            decoration: BoxDecoration(
-              color: backgroundShape,
-              borderRadius: BorderRadius.circular(roundedCornerMD),
-            ),
-            padding: const EdgeInsets.all(smPadding - 2),
+          return FadeTransition(
+            opacity: _fadeAnimation,
             child: Container(
               padding: const EdgeInsets.all(mdPadding),
               decoration: BoxDecoration(
@@ -75,7 +97,7 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Working period'.toUpperCase(), style: getSubTitle()),
+                  Text('Working period'.toUpperCase(), style: getTitle()),
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -83,7 +105,10 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
                     itemBuilder: (context, index) {
                       final period = workPeriodProvider.cards[index];
                       return Padding(
-                        padding: const EdgeInsets.all(mdPadding),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: mdPadding + 4,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -96,7 +121,7 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) =>
-                        const SizedBox(height: 10),
+                        const SizedBox(height: mdPadding),
                   ),
                 ],
               ),
@@ -108,31 +133,28 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection> {
   }
 
   _buildBodyPeriod(String contentTitle, String contentValue) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 5.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              contentTitle,
-              style: getBody(),
-            ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            contentTitle,
+            style: getSubTitle().copyWith(fontWeight: FontWeight.w500),
           ),
-          Text(
-            ' : ',
-            style: getBody(),
+        ),
+        Text(
+          ' : ',
+          style: getSubTitle().copyWith(fontWeight: FontWeight.w500),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(
+            contentValue,
+            style: getSubTitle().copyWith(fontWeight: FontWeight.w500),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              contentValue,
-              style: getBody(),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
