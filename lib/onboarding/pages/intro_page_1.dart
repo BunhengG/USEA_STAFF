@@ -16,6 +16,7 @@ class _PageOneState extends State<PageOne> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: Stack(
         children: [
           Positioned(
@@ -59,14 +60,13 @@ class _PageOneState extends State<PageOne> {
                       children: [
                         const SizedBox(height: defaultPadding),
                         LottieBuilder.asset(
-                          "assets/img/page1.json",
+                          "assets/img/page01.json",
                           fit: BoxFit.cover,
-                          height: 310,
+                          height: 350,
                           repeat: true,
                           reverse: true,
                           width: double.infinity,
                         ),
-                        const SizedBox(height: defaultPadding),
                         Text(
                           "Welcome to usea check".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(
@@ -76,7 +76,7 @@ class _PageOneState extends State<PageOne> {
                         ),
                         const SizedBox(height: defaultPadding),
                         Text(
-                          "Discover the Company of Check Attendance with QR Scan"
+                          "to manage employee attendance with QR Scan."
                               .toUpperCase(),
                           style: getWhiteSubTitle(),
                         ),
