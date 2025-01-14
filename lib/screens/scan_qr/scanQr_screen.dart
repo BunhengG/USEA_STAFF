@@ -19,9 +19,17 @@ class CheckInOutQRScreen extends StatefulWidget {
 class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
+  Barcode? result;
   bool _isFlashOn = false;
   bool isProcessing = false;
   bool _hasScanned = false;
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    controller?.pauseCamera();
+    controller?.resumeCamera();
+  }
 
   @override
   void initState() {
@@ -105,11 +113,11 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
             onQRViewCreated: _onQRViewCreated,
             overlay: QrScannerOverlayShape(
               overlayColor: Colors.black54,
-              borderColor: secondaryColor,
+              borderColor: Colors.transparent,
               borderRadius: roundedCornerLG,
               borderLength: 32,
-              borderWidth: 1,
-              cutOutBottomOffset: 74,
+              borderWidth: 8,
+              cutOutBottomOffset: 75,
               cutOutSize: MediaQuery.of(context).size.width * 0.7,
             ),
             onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
@@ -216,8 +224,13 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
       if (scanData.code != null && !_hasScanned && !isProcessing) {
-        _hasScanned = true;
-        isProcessing = true;
+        if (mounted) {
+          setState(() {
+            result = scanData;
+            isProcessing = true;
+            _hasScanned = true;
+          });
+        }
 
         //! Validate QR code format before proceeding with the
 
@@ -234,7 +247,9 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
               behavior: SnackBarBehavior.floating,
             ),
           );
-          isProcessing = false;
+          if (mounted) {
+            setState(() => isProcessing = false);
+          }
           return;
         }
 
@@ -267,7 +282,9 @@ class _CheckInOutQRScreenState extends State<CheckInOutQRScreen> {
             });
           }
         }
-        isProcessing = false;
+        if (mounted) {
+          setState(() => isProcessing = false);
+        }
       }
     });
   }
