@@ -81,24 +81,14 @@ class CheckInOutProvider with ChangeNotifier {
         } else {
           if (firstShift['checkIn'] == null) {
             _shiftStatus = 'checkIn';
-          } else if (firstShift['checkIn'] != null &&
-              firstShift['checkOut'] == null) {
+          } else if (firstShift['checkOut'] == null) {
             _shiftStatus = 'checkOut';
-          } else if (firstShift['checkOut'] != null &&
-              secondShift['checkIn'] == null) {
+          } else if (secondShift['checkIn'] == null) {
             _shiftStatus = 'checkIn';
-          } else if (firstShift['checkOut'] != null &&
-              secondShift['checkIn'] != null &&
-              secondShift['checkOut'] == null) {
+          } else if (secondShift['checkOut'] == null) {
             _shiftStatus = 'checkOut';
           } else {
             _shiftStatus = 'disabled';
-          }
-
-          // Check if first shift checkout is null, disable second shift operations
-          if (firstShift['checkOut'] == null) {
-            _shiftStatus =
-                'disabled'; // Disable second shift if first shift is incomplete
           }
         }
 
