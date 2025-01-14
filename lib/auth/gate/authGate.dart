@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:usea_staff_test/constant/constant.dart';
 import '../../helper/shared_pref_helper.dart';
+import '../../onboarding/onboarding_screen.dart';
 import '../../screens/home_screen.dart';
-import '../login_screen.dart';
+// import '../login_screen.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -51,7 +52,10 @@ class _AuthGateState extends State<AuthGate> {
         }
 
         // Return the appropriate screen based on login status
-        return snapshot.data == true ? const HomeScreen() : const LoginScreen();
+        // return snapshot.data == true ? const HomeScreen() : const LoginScreen();
+        return snapshot.data == true
+            ? const HomeScreen()
+            : const OnboardingScreen();
       },
     );
   }

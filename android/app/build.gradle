@@ -27,7 +27,8 @@ if (flutterVersionName == null) {
 android {
     namespace = "com.example.usea_staff_test"
     compileSdk = 34
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion
+    ndkVersion "27.2.12479018"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

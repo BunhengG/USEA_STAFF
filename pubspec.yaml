@@ -60,6 +60,7 @@ dependencies:
   reorderable_grid_view: ^2.2.8
   flutter_launcher_icons: ^0.13.1
   google_maps_flutter: ^2.9.0
+  rive: ^0.13.20
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +87,7 @@ flutter:
   assets:
     - assets/img/
     - assets/icon/
+    - assets/RiveAssets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

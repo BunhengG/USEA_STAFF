@@ -22,8 +22,8 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection>
 
     // Initialize the animation controller
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500), // Adjust duration as needed
-      vsync: this, // TickerProviderStateMixin provides vsync
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -46,7 +46,6 @@ class _WorkingPeriodSectionState extends State<WorkingPeriodSection>
       padding: const EdgeInsets.all(0.0),
       child: Consumer<ProfileProvider>(
         builder: (context, workPeriodProvider, child) {
-          // Start fade-in animation once the data is loaded
           if (!workPeriodProvider.isLoading) {
             _controller.forward();
           }
