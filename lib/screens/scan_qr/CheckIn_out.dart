@@ -30,8 +30,9 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
         String userId = userIdSPH;
         String currentTime =
             DateTime.now().toLocal().toString().substring(11, 19);
-
-        provider.updateButtonState(currentTime, userId);
+        if (mounted) {
+          provider.updateButtonState(currentTime, userId);
+        }
       } else {
         print("User ID is null. Please log in again.");
       }
@@ -176,10 +177,26 @@ class _CheckInAndOutRecordState extends State<CheckInAndOutRecord> {
                 buttonText = 'Check-out';
 
                 if (provider.shouldShowCheckOutReason) {
-                  onTap = () => _showReasonCheckOut(context);
+                  onTap = () {
+                    _showReasonCheckOut(context);
+                    print('Showing check-out reason modal');
+                  };
                 } else {
-                  onTap = () => provider.checkInOut("qrCode", reason: "");
+                  onTap = () async {
+                    await provider.checkInOut("qrCode", reason: "");
+                    print('Proceeding with check-out without reason');
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CheckInOutQRScreen(
+                          reason: 'Nothing',
+                        ),
+                      ),
+                    );
+                  };
                 }
+
                 break;
               case 'disabled':
                 buttonColor = placeholderColor;

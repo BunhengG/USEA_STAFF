@@ -12,21 +12,33 @@ class DigitalClock extends StatefulWidget {
 }
 
 class _DigitalClockState extends State<DigitalClock> {
+  late Timer _timer;
+  late DateTime _dateTime;
+
   @override
   void initState() {
     super.initState();
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {});
+    _dateTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _dateTime = DateTime.now();
+        });
+      }
     });
   }
 
   @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    DateTime dateTime = DateTime.now();
-    // final format = DateFormat('hh:mm:ss a');
     final format = DateFormat('hh:mm a');
     return Text(
-      format.format(dateTime),
+      format.format(_dateTime),
       style: getWhiteSubTitle().copyWith(fontSize: 18),
     );
   }
