@@ -97,7 +97,6 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget>
                 secondCheckInTime,
                 secondCheckOutTime,
               ),
-              padding: const EdgeInsets.all(mdPadding),
               decoration: BoxDecoration(
                 color: secondaryColor,
                 borderRadius: BorderRadius.circular(roundedCornerSM),
@@ -106,13 +105,13 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget>
             )
           : provider.errorMessage != null
               ? Center(
-                  child: Text(provider.errorMessage!, style: getSubTitle()),
+                  child: Text(provider.errorMessage!, style: getBody()),
                 )
               : provider.shiftSummary == null
                   ? Center(
                       child: Text(
                         'No shift data available.',
-                        style: getSubTitle(),
+                        style: getBody(),
                       ),
                     )
                   : FadeTransition(
@@ -121,12 +120,11 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: smPadding - 4),
                             Text(
                               dateShift,
                               style: getTitle().copyWith(fontSize: 16),
                             ),
-                            const SizedBox(height: defaultPadding * 1.5),
+                            const SizedBox(height: defaultPadding),
 
                             // NOTE: 1st Check-in
                             _buildCheckIn(
@@ -188,8 +186,8 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget>
                 Text(
                   '• ',
                   style: title != 'N/A'
-                      ? getTitle().copyWith(color: textColor)
-                      : getTitle(),
+                      ? getTitle().copyWith(color: textColor, fontSize: 28)
+                      : getTitle().copyWith(fontSize: 28),
                 ),
                 Text(shiftTitle, style: getSubTitle()),
               ],
@@ -230,21 +228,14 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget>
                 Text(
                   '• ',
                   style: title != 'N/A'
-                      ? getTitle().copyWith(color: textColor)
-                      : getTitle(),
+                      ? getTitle().copyWith(color: textColor, fontSize: 28)
+                      : getTitle().copyWith(fontSize: 28),
                 ),
                 Text(shiftTitle, style: getSubTitle()),
               ],
             ),
             const SizedBox(width: defaultPadding * 1.3),
-            // Text(
-            //   title == 'N/A'
-            //       ? ''
-            //       : title == 'Good'
-            //           ? '🔵 Good'
-            //           : '',
-            //   style: getBody().copyWith(fontSize: 14),
-            // )
+
             if (title != 'N/A')
               Text(
                 title,
