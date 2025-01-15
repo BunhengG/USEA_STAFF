@@ -207,11 +207,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             Text(shiftTitle, style: getSubTitle()),
             const SizedBox(width: defaultPadding * 1.3),
             Text(
-              status == 'N/A'
-                  ? ''
-                  : status == 'Good'
-                      ? '🔵 Good'
-                      : '',
+              status,
               style: getBody().copyWith(fontSize: 14),
             ),
           ],
