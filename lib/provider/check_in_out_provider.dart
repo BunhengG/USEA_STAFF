@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest.dart';
 import 'package:timezone/timezone.dart' as tz;
 import '../helper/shared_pref_helper.dart';
 import '../utils/domain.dart';
@@ -11,8 +11,6 @@ import '../utils/domain.dart';
 class CheckInOutProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
-  String? _checkOutTime;
-
   String? _shiftStatus;
   String? _shiftType;
   bool get isLoading => _isLoading;
@@ -33,14 +31,8 @@ class CheckInOutProvider with ChangeNotifier {
   }
 
   // Method to set the shiftStatus and notify listeners
-  void setShiftStatus(String status, {String? additionalData}) {
+  void setShiftStatus(String status) {
     _shiftStatus = status;
-
-    print('Setting shift status: $_shiftStatus');
-
-    if (additionalData != null) {
-      print('Additional Data: $additionalData');
-    }
     notifyListeners();
   }
 
@@ -112,17 +104,29 @@ class CheckInOutProvider with ChangeNotifier {
     }
   }
 
-  //? Checking if check-in is late
+  //* Checking if check-in is late
   bool get shouldShowCheckInReason {
     tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
 
     // Define first shift start time
-    tz.TZDateTime firstShiftStart = tz.TZDateTime(phnomPenh, currentTime.year,
-        currentTime.month, currentTime.day, 7, 0); // 07:00 AM
+    tz.TZDateTime firstShiftStart = tz.TZDateTime(
+      phnomPenh,
+      currentTime.year,
+      currentTime.month,
+      currentTime.day,
+      7,
+      0,
+    ); // 07:00 AM
 
     // Define second shift start time
-    tz.TZDateTime secondShiftStart = tz.TZDateTime(phnomPenh, currentTime.year,
-        currentTime.month, currentTime.day, 14, 0); // 02:00 PM
+    tz.TZDateTime secondShiftStart = tz.TZDateTime(
+      phnomPenh,
+      currentTime.year,
+      currentTime.month,
+      currentTime.day,
+      14,
+      0,
+    ); // 02:00 PM
 
     // Check if it's late for the first shift
     if (currentTime.isAfter(firstShiftStart) &&
@@ -139,47 +143,27 @@ class CheckInOutProvider with ChangeNotifier {
     return false;
   }
 
-//! Updating ======================
-  bool get shouldShowFirstShiftCheckOutReason {
+  //* Checking if check-out is early
+  bool get shouldShowCheckOutReason {
     tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
 
-    tz.TZDateTime noon = tz.TZDateTime(phnomPenh, currentTime.year,
+    tz.TZDateTime firstShiftEnd = tz.TZDateTime(phnomPenh, currentTime.year,
         currentTime.month, currentTime.day, 12, 0); // 12:00 PM
 
-    // Show reason if check-out is after 12:00 PM (late check-out)
-    if (currentTime.isAfter(noon)) {
-      print('First shift check-out is after 12:00 PM, reason is required.');
-      return true;
-    }
-
-    print('First shift check-out does not require a reason.');
-    return false;
-  }
-
-  bool get shouldShowSecondShiftCheckOutReason {
-    tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
-
-    tz.TZDateTime evening = tz.TZDateTime(phnomPenh, currentTime.year,
+    tz.TZDateTime secondShiftEnd = tz.TZDateTime(phnomPenh, currentTime.year,
         currentTime.month, currentTime.day, 17, 0); // 05:00 PM
 
-    // Show reason if check-out is after 5:00 PM (late check-out)
-    if (currentTime.isAfter(evening)) {
-      print('Second shift check-out is after 5:00 PM, reason is required.');
-      return true;
+    // Check for early check-out reasons for first shift
+    if (currentTime.isBefore(firstShiftEnd)) {
+      return true; // Reason required if check-out is before 12:00 PM
     }
 
-    print('Second shift check-out does not require a reason.');
+    // Check for early check-out reasons for second shift
+    if (currentTime.isBefore(secondShiftEnd)) {
+      return true; // Reason required if check-out is before 5:00 PM
+    }
+
     return false;
-  }
-
-  bool get shouldShowCheckOutReason {
-    final isSecondShiftCheckOutAfter5 = shouldShowSecondShiftCheckOutReason &&
-        _checkOutTime == null &&
-        DateFormat('HH:mm')
-            .parse(_checkOutTime!)
-            .isAfter(DateFormat('HH:mm').parse('17:00'));
-
-    return shouldShowFirstShiftCheckOutReason || isSecondShiftCheckOutAfter5;
   }
 
   //NOTE: Check in and out of the specified
@@ -201,6 +185,9 @@ class CheckInOutProvider with ChangeNotifier {
       String checkInTime = DateFormat('HH:mm:ss').format(currentTime);
       String checkOutTime = DateFormat('HH:mm:ss').format(currentTime);
 
+      print('checkOutTime: $checkOutTime');
+      print('checkInTime: $checkInTime');
+
       final userId = await SharedPrefHelper.getUserId();
       if (userId == null) {
         _errorMessage = 'User ID not found. Please log in again.';
@@ -219,54 +206,6 @@ class CheckInOutProvider with ChangeNotifier {
 
       if (distanceInMeters > allowedRange) {
         _errorMessage = 'You are not within the allowed range for check-in.';
-        notifyListeners();
-        return;
-      }
-
-      // Fetch shift data
-      final currentDate = getCurrentDateFormatted();
-      final encodedUserId = Uri.encodeComponent(userId);
-      final url =
-          Uri.parse('${ApiEndpoints.getShifts}$encodedUserId/$currentDate');
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final shiftData = data[0];
-        final shiftRecord = shiftData['shiftRecord'];
-        final firstShift = shiftRecord['firstShift'];
-        final secondShift = shiftRecord['secondShift'];
-
-        // Prioritize first shift check-out
-        if (firstShift['checkIn'] != null && firstShift['checkOut'] == null) {
-          _shiftType = 'firstShift'; // Checkout for first shift
-          print('You are checking out for the first shift.');
-        } else if (firstShift['checkIn'] != null &&
-            firstShift['checkOut'] != null) {
-          // First shift completed, now allow check-in for second shift
-          if (secondShift['checkIn'] == null) {
-            _shiftType = 'secondShift'; // Checking in for second shift
-            print('You are checking in for the second shift.');
-          } else if (secondShift['checkIn'] != null &&
-              secondShift['checkOut'] == null) {
-            _shiftType = 'secondShift'; // Checking out for second shift
-            print('You are checking out for the second shift.');
-          } else {
-            _shiftType = 'disabled';
-            _errorMessage =
-                'All shifts are either completed or not yet checked in.';
-            notifyListeners();
-            return;
-          }
-        } else {
-          _shiftType = 'disabled';
-          _errorMessage =
-              'All shifts are either completed or not yet checked in.';
-          notifyListeners();
-          return;
-        }
-      } else {
-        _errorMessage = 'Failed to fetch shift data.';
         notifyListeners();
         return;
       }
@@ -310,17 +249,19 @@ class CheckInOutProvider with ChangeNotifier {
         "reason": reason,
       };
 
-      var postResponse = await http.post(
+      // print("Sending request: $requestBody");
+
+      var response = await http.post(
         Uri.parse(ApiEndpoints.getCheckInOut),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
 
-      if (postResponse.statusCode == 201) {
+      if (response.statusCode == 201) {
         _errorMessage = null;
 
         // Parse the response body to get shift data
-        final data = jsonDecode(postResponse.body);
+        final data = jsonDecode(response.body);
 
         String shiftStatus;
 
@@ -337,26 +278,24 @@ class CheckInOutProvider with ChangeNotifier {
           }
         } else {
           // Allow check-in and check-out for first shift
-          if (data['shiftRecord']['firstShift']['checkOut'] == null) {
-            shiftStatus = 'checkOut';
+          if (data['shiftRecord']['firstShift']['checkIn'] == null) {
+            shiftStatus = 'checkIn'; // Allow check-in for first shift
+          } else if (data['shiftRecord']['firstShift']['checkOut'] == null) {
+            shiftStatus = 'checkOut'; // Allow check-out for first shift
           } else {
             shiftStatus = 'disabled';
           }
         }
 
-        _shiftStatus = shiftStatus;
-        notifyListeners();
+        setShiftStatus(shiftStatus);
+      } else {
+        _errorMessage = 'Error: ${response.body}';
       }
     } catch (e) {
-      _errorMessage = 'Error occurred during check-in/out: $e';
-      notifyListeners();
+      _errorMessage = 'Error: $e';
     } finally {
       _isLoading = false;
+      notifyListeners();
     }
-  }
-
-  //* Helper function to load time zones
-  Future<void> initializeTimeZones() async {
-    tz.initializeTimeZones();
   }
 }
