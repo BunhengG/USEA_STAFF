@@ -1,3 +1,230 @@
+// // BUG: Fixing
+
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:intl/intl.dart';
+// import 'package:timezone/data/latest.dart';
+// import 'package:timezone/timezone.dart' as tz;
+// import '../helper/shared_pref_helper.dart';
+// import '../utils/domain.dart';
+
+// class CheckInOutProvider with ChangeNotifier {
+//   bool _isLoading = false;
+//   String? _errorMessage;
+//   String? _shiftStatus;
+//   String? _shiftType;
+
+//   bool get isLoading => _isLoading;
+//   String? get errorMessage => _errorMessage;
+//   String? get shiftStatus => _shiftStatus;
+//   String? get shiftType => _shiftType;
+
+//   final double fixedLatitude = 13.350918350149795;
+//   final double fixedLongitude = 103.86433962916841;
+//   final double allowedRange = 50.0;
+
+//   late tz.Location phnomPenh;
+
+//   CheckInOutProvider() {
+//     initializeTimeZones();
+//     phnomPenh = tz.getLocation('Asia/Phnom_Penh');
+//   }
+
+//   void setShiftStatus(String status) {
+//     _shiftStatus = status;
+//     notifyListeners();
+//   }
+
+//   Future<void> updateButtonState(String currentTime, String userId) async {
+//     if (userId.isEmpty) {
+//       _setErrorMessage('User ID is empty. Please log in again.');
+//       return;
+//     }
+
+//     _setLoadingState(true);
+//     final currentDate = _getFormattedDate();
+//     final encodedUserId = Uri.encodeComponent(userId);
+//     final url =
+//         Uri.parse('${ApiEndpoints.getShifts}$encodedUserId/$currentDate');
+
+//     try {
+//       final response = await http.get(url);
+//       if (response.statusCode == 200) {
+//         _processShiftData(jsonDecode(response.body));
+//       } else {
+//         _setErrorMessage('Failed to fetch shift data.');
+//       }
+//     } catch (e) {
+//       _setErrorMessage('Error: $e');
+//     } finally {
+//       _setLoadingState(false);
+//     }
+//   }
+
+//   Future<void> checkInOut(String qrCode, {required String reason}) async {
+//     if (!_isValidQRCode(qrCode)) {
+//       _setErrorMessage('Invalid QR code format.');
+//       return;
+//     }
+
+//     _setLoadingState(true);
+//     try {
+//       final userId = await SharedPrefHelper.getUserId();
+//       if (userId == null) {
+//         _setErrorMessage('User ID not found. Please log in again.');
+//         return;
+//       }
+
+//       if (!await _isWithinAllowedRange()) {
+//         _setErrorMessage('You are not within the allowed range for check-in.');
+//         return;
+//       }
+
+//       if (_shiftStatus == 'checkOut' && !_isReasonValid(reason)) {
+//         return;
+//       }
+
+//       final requestBody = _createRequestBody(userId, reason);
+//       final response = await http.post(
+//         Uri.parse(ApiEndpoints.getCheckInOut),
+//         headers: {'Content-Type': 'application/json'},
+//         body: jsonEncode(requestBody),
+//       );
+
+//       if (response.statusCode == 201) {
+//         _processCheckInOutResponse(jsonDecode(response.body));
+//       } else {
+//         _setErrorMessage('Error: ${response.body}');
+//       }
+//     } catch (e) {
+//       _setErrorMessage('Error: $e');
+//     } finally {
+//       _setLoadingState(false);
+//     }
+//   }
+
+//   bool get shouldShowCheckInReason => _isLateForShift();
+//   bool get shouldShowCheckOutReason => _isEarlyForShiftEnd();
+
+//   // Helper Methods
+//   void _setLoadingState(bool isLoading) {
+//     _isLoading = isLoading;
+//     notifyListeners();
+//   }
+
+//   void _setErrorMessage(String message) {
+//     _errorMessage = message;
+//     notifyListeners();
+//   }
+
+//   String _getFormattedDate() {
+//     final now = DateTime.now();
+//     return DateFormat('dd MMMM yyyy').format(now);
+//   }
+
+//   bool _isValidQRCode(String qrCode) =>
+//       qrCode.startsWith('usea') && qrCode.length >= 7;
+
+//   Future<bool> _isWithinAllowedRange() async {
+//     final position = await Geolocator.getCurrentPosition(
+//         desiredAccuracy: LocationAccuracy.high);
+//     final distance = Geolocator.distanceBetween(
+//       position.latitude,
+//       position.longitude,
+//       fixedLatitude,
+//       fixedLongitude,
+//     );
+//     return distance <= allowedRange;
+//   }
+
+//   bool _isLateForShift() {
+//     final now = tz.TZDateTime.now(phnomPenh);
+//     final firstShiftStart = _getShiftTime(hour: 7);
+//     final secondShiftStart = _getShiftTime(hour: 14);
+
+//     return now.isAfter(firstShiftStart) &&
+//             now.isBefore(firstShiftStart.add(const Duration(hours: 5))) ||
+//         now.isAfter(secondShiftStart) &&
+//             now.isBefore(secondShiftStart.add(const Duration(hours: 3)));
+//   }
+
+//   bool _isEarlyForShiftEnd() {
+//     final now = tz.TZDateTime.now(phnomPenh);
+//     final firstShiftEnd = _getShiftTime(hour: 12);
+//     final secondShiftEnd = _getShiftTime(hour: 17);
+
+//     return now.isBefore(firstShiftEnd) || now.isBefore(secondShiftEnd);
+//   }
+
+//   bool _isReasonValid(String reason) {
+//     if (reason.trim().isEmpty) {
+//       _setErrorMessage('Reason is required for early check-out.');
+//       return false;
+//     }
+//     return true;
+//   }
+
+//   Map<String, dynamic> _createRequestBody(String userId, String reason) {
+//     final now = tz.TZDateTime.now(phnomPenh);
+//     final time = DateFormat('HH:mm:ss').format(now);
+//     final shift = (_shiftType == 'firstShift') ? 'firstShift' : 'secondShift';
+
+//     return {
+//       "userId": userId,
+//       "shift": shift,
+//       "checkInTime": time,
+//       "checkOutTime": time,
+//       "reason": reason,
+//     };
+//   }
+
+//   tz.TZDateTime _getShiftTime({required int hour}) {
+//     final now = tz.TZDateTime.now(phnomPenh);
+//     return tz.TZDateTime(phnomPenh, now.year, now.month, now.day, hour, 0);
+//   }
+
+//   void _processShiftData(dynamic data) {
+//     final shiftData = data[0];
+//     final shiftRecord = shiftData['shiftRecord'];
+//     _shiftType = shiftData['shift'];
+
+//     final isToday = _getFormattedDate() == shiftData['date'];
+//     if (!isToday || shiftRecord['firstShift']['checkIn'] == null) {
+//       _shiftStatus = 'checkIn';
+//     } else if (shiftRecord['firstShift']['checkOut'] == null ||
+//         shiftRecord['secondShift']['checkIn'] == null ||
+//         shiftRecord['secondShift']['checkOut'] == null) {
+//       _shiftStatus = shiftRecord['firstShift']['checkOut'] == null
+//           ? 'checkOut'
+//           : 'checkIn';
+//     } else {
+//       _shiftStatus = 'disabled';
+//     }
+
+//     notifyListeners();
+//   }
+
+//   void _processCheckInOutResponse(dynamic data) {
+//     final shiftRecord = data['shiftRecord'];
+
+//     if (shiftRecord['firstShift']['checkIn'] != null &&
+//         shiftRecord['firstShift']['checkOut'] != null &&
+//         shiftRecord['secondShift']['checkIn'] == null) {
+//       _shiftStatus = 'checkIn';
+//     } else if (shiftRecord['secondShift']['checkOut'] == null) {
+//       _shiftStatus = 'checkOut';
+//     } else {
+//       _shiftStatus = 'disabled';
+//     }
+
+//     notifyListeners();
+//   }
+// }
+
+// BUG: Fixing
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,293 +236,226 @@ import '../helper/shared_pref_helper.dart';
 import '../utils/domain.dart';
 
 class CheckInOutProvider with ChangeNotifier {
+  // Constants
+  static const double _fixedLatitude = 13.350918350149795;
+  static const double _fixedLongitude = 103.86433962916841;
+  static const double _allowedRange = 50.0;
+
+  // Variables
   bool _isLoading = false;
   String? _errorMessage;
   String? _shiftStatus;
-  String? _shiftType;
+  late tz.Location _phnomPenh;
+
+  // Getters
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get shiftStatus => _shiftStatus;
-  String? get shiftType => _shiftType;
 
-  final double fixedLatitude = 13.350918350149795;
-  final double fixedLongitude = 103.86433962916841;
-  final double allowedRange = 50.0;
-
-  // Initialize time zones
-  late tz.Location phnomPenh;
-
-  CheckInOutProvider() {
-    initializeTimeZones();
-    phnomPenh = tz.getLocation('Asia/Phnom_Penh');
+  String get activeShiftInfo {
+    if (_shiftStatus == 'checkIn') {
+      if (_isFirstShift) return 'Check-In for First Shift';
+      if (_isSecondShift) return 'Check-In for Second Shift';
+    } else if (_shiftStatus == 'checkOut') {
+      if (_isFirstShift) return 'Check-Out for First Shift';
+      if (_isSecondShift) return 'Check-Out for Second Shift';
+    }
+    return 'No Active Shift';
   }
 
-  // Method to set the shiftStatus and notify listeners
+  // Constructor
+  CheckInOutProvider() {
+    initializeTimeZones();
+    _phnomPenh = tz.getLocation('Asia/Phnom_Penh');
+  }
+
+  // Public Methods
   void setShiftStatus(String status) {
     _shiftStatus = status;
     notifyListeners();
   }
 
-  // Helper method to get the current date formatted
-  String getCurrentDateFormatted() {
-    final DateTime now = DateTime.now();
-    final String formattedDate = DateFormat('dd MMMM yyyy').format(now);
-    return formattedDate;
-  }
-
-  //NOTE: Update button state based on current time and shift
   Future<void> updateButtonState(String currentTime, String userId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      if (userId.isEmpty) {
-        _errorMessage = 'User ID is empty. Please log in again.';
-        notifyListeners();
-        return;
-      }
-
-      final currentDate = getCurrentDateFormatted();
-      final encodedUserId = Uri.encodeComponent(userId);
-
-      final url =
-          Uri.parse('${ApiEndpoints.getShifts}$encodedUserId/$currentDate');
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final shiftData = data[0];
-        final shiftRecord = shiftData['shiftRecord'];
-        final firstShift = shiftRecord['firstShift'];
-        final secondShift = shiftRecord['secondShift'];
-
-        _shiftType = shiftData['shift'];
-
-        tz.TZDateTime now = tz.TZDateTime.now(phnomPenh);
-        String currentDateString = DateFormat('dd MMMM yyyy').format(now);
-        String shiftDateString = shiftData['date'];
-
-        if (currentDateString != shiftDateString) {
-          _shiftStatus = 'checkIn';
-        } else {
-          if (firstShift['checkIn'] == null) {
-            _shiftStatus = 'checkIn';
-          } else if (firstShift['checkOut'] == null) {
-            _shiftStatus = 'checkOut';
-          } else if (secondShift['checkIn'] == null) {
-            _shiftStatus = 'checkIn';
-          } else if (secondShift['checkOut'] == null) {
-            _shiftStatus = 'checkOut';
-          } else {
-            _shiftStatus = 'disabled';
-          }
-        }
-
-        notifyListeners();
-      } else {
-        _errorMessage = 'Failed to fetch shift data.';
-      }
-    } catch (e) {
-      _errorMessage = 'Error: $e';
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  //* Checking if check-in is late
-  bool get shouldShowCheckInReason {
-    tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
-
-    // Define first shift start time
-    tz.TZDateTime firstShiftStart = tz.TZDateTime(
-      phnomPenh,
-      currentTime.year,
-      currentTime.month,
-      currentTime.day,
-      7,
-      0,
-    ); // 07:00 AM
-
-    // Define second shift start time
-    tz.TZDateTime secondShiftStart = tz.TZDateTime(
-      phnomPenh,
-      currentTime.year,
-      currentTime.month,
-      currentTime.day,
-      14,
-      0,
-    ); // 02:00 PM
-
-    // Check if it's late for the first shift
-    if (currentTime.isAfter(firstShiftStart) &&
-        currentTime.isBefore(firstShiftStart.add(const Duration(hours: 5)))) {
-      return true;
-    }
-
-    // Check if it's late for the second shift
-    if (currentTime.isAfter(secondShiftStart) &&
-        currentTime.isBefore(secondShiftStart.add(const Duration(hours: 3)))) {
-      return true;
-    }
-
-    return false;
-  }
-
-  //* Checking if check-out is early
-  bool get shouldShowCheckOutReason {
-    tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
-
-    tz.TZDateTime firstShiftEnd = tz.TZDateTime(phnomPenh, currentTime.year,
-        currentTime.month, currentTime.day, 12, 0); // 12:00 PM
-
-    tz.TZDateTime secondShiftEnd = tz.TZDateTime(phnomPenh, currentTime.year,
-        currentTime.month, currentTime.day, 17, 0); // 05:00 PM
-
-    // Check for early check-out reasons for first shift
-    if (currentTime.isBefore(firstShiftEnd)) {
-      return true; // Reason required if check-out is before 12:00 PM
-    }
-
-    // Check for early check-out reasons for second shift
-    if (currentTime.isBefore(secondShiftEnd)) {
-      return true; // Reason required if check-out is before 5:00 PM
-    }
-
-    return false;
-  }
-
-  //NOTE: Check in and out of the specified
-  Future<void> checkInOut(String qrCode, {required String reason}) async {
-    if (!qrCode.startsWith('usea') || qrCode.length < 7) {
-      _errorMessage = 'Invalid QR code format.';
-      notifyListeners();
+    if (userId.isEmpty) {
+      _setError('User ID is empty. Please log in again.');
       return;
     }
 
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    final currentDate = _formattedDate();
+    final encodedUserId = Uri.encodeComponent(userId);
+    final url =
+        Uri.parse('${ApiEndpoints.getShifts}$encodedUserId/$currentDate');
 
     try {
-      // for Phnom Penh
-      initializeTimeZones();
-      tz.TZDateTime currentTime = tz.TZDateTime.now(phnomPenh);
-      String checkInTime = DateFormat('HH:mm:ss').format(currentTime);
-      String checkOutTime = DateFormat('HH:mm:ss').format(currentTime);
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        _processShiftData(jsonDecode(response.body));
+      } else {
+        _setError('Failed to fetch shift data.');
+      }
+    } catch (e) {
+      _setError('Error: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-      print('checkOutTime: $checkOutTime');
-      print('checkInTime: $checkInTime');
+  void _processShiftData(dynamic data) {
+    final shiftData = data[0];
+    final shiftRecord = shiftData['shiftRecord'];
 
+    final isToday = _formattedDate() == shiftData['date'];
+    if (!isToday || shiftRecord['firstShift']['checkIn'] == null) {
+      _shiftStatus = 'checkIn';
+    } else if (shiftRecord['firstShift']['checkOut'] == null) {
+      _shiftStatus = 'checkOut';
+    } else if (shiftRecord['secondShift']['checkIn'] == null) {
+      _shiftStatus = 'checkIn';
+    } else if (shiftRecord['secondShift']['checkOut'] == null) {
+      _shiftStatus = 'checkOut';
+    } else {
+      _shiftStatus = 'disabled';
+    }
+    notifyListeners();
+  }
+
+  // NOTE: Check-in and Check-out
+  Future<void> checkInOut(String qrCode, {required String reason}) async {
+    if (!_isValidQRCode(qrCode)) {
+      _setError('Invalid QR code format.');
+      return;
+    }
+
+    _setLoading(true);
+    try {
       final userId = await SharedPrefHelper.getUserId();
       if (userId == null) {
-        _errorMessage = 'User ID not found. Please log in again.';
-        notifyListeners();
+        _setError('User ID not found. Please log in again.');
         return;
       }
 
-      final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      double distanceInMeters = Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        fixedLatitude,
-        fixedLongitude,
-      );
-
-      if (distanceInMeters > allowedRange) {
-        _errorMessage = 'You are not within the allowed range for check-in.';
-        notifyListeners();
+      if (!await _isWithinAllowedRange()) {
+        _setError('You are not within the allowed range for check-in.');
         return;
       }
 
-      // Validate early check-out and show modal for reasons only if necessary
-      if (_shiftStatus == 'checkOut') {
-        if (_shiftType == 'firstShift') {
-          final checkOutTimeParsed = DateFormat('HH:mm').parse(checkOutTime);
-
-          // Check-out before 12:00 PM requires reason
-          if (checkOutTimeParsed.isBefore(DateFormat('HH:mm').parse('12:00'))) {
-            if (reason.trim().isEmpty) {
-              _errorMessage = 'Reason is required for early check-out.';
-              notifyListeners();
-              return;
-            }
-          }
-        } else if (_shiftType == 'secondShift') {
-          final checkOutTimeParsed = DateFormat('HH:mm').parse(checkOutTime);
-
-          // Check-out before 5:00 PM requires reason
-          if (checkOutTimeParsed.isBefore(DateFormat('HH:mm').parse('17:00'))) {
-            if (reason.trim().isEmpty) {
-              _errorMessage = 'Reason is required for early check-out.';
-              notifyListeners();
-              return;
-            }
-          }
-        }
+      if (_shiftStatus == 'checkOut' && !_isReasonValid(reason)) {
+        return;
       }
 
-      // Validate shift type for check-in/out
-      String shift =
-          (_shiftType == 'firstShift') ? 'firstShift' : 'secondShift';
-
-      Map<String, dynamic> requestBody = {
-        "userId": userId,
-        "shift": shift,
-        "checkInTime": checkInTime,
-        "checkOutTime": checkOutTime,
-        "reason": reason,
-      };
-
-      // print("Sending request: $requestBody");
-
-      var response = await http.post(
+      final requestBody = _createRequestBody(userId, reason);
+      final response = await http.post(
         Uri.parse(ApiEndpoints.getCheckInOut),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
 
       if (response.statusCode == 201) {
-        _errorMessage = null;
-
-        // Parse the response body to get shift data
-        final data = jsonDecode(response.body);
-
-        String shiftStatus;
-
-        // Check if first shift is completed
-        if (data['shiftRecord']['firstShift']['checkIn'] != null &&
-            data['shiftRecord']['firstShift']['checkOut'] != null) {
-          // If first shift is completed, move to second shift
-          if (data['shiftRecord']['secondShift']['checkIn'] == null) {
-            shiftStatus = 'checkIn'; // Allow check-in for second shift
-          } else if (data['shiftRecord']['secondShift']['checkOut'] == null) {
-            shiftStatus = 'checkOut'; // Allow check-out for second shift
-          } else {
-            shiftStatus = 'disabled';
-          }
-        } else {
-          // Allow check-in and check-out for first shift
-          if (data['shiftRecord']['firstShift']['checkIn'] == null) {
-            shiftStatus = 'checkIn'; // Allow check-in for first shift
-          } else if (data['shiftRecord']['firstShift']['checkOut'] == null) {
-            shiftStatus = 'checkOut'; // Allow check-out for first shift
-          } else {
-            shiftStatus = 'disabled';
-          }
-        }
-
-        setShiftStatus(shiftStatus);
+        _processCheckInOutResponse(jsonDecode(response.body));
       } else {
-        _errorMessage = 'Error: ${response.body}';
+        _setError('Error: ${response.body}');
       }
     } catch (e) {
-      _errorMessage = 'Error: $e';
+      _setError('Error: $e');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
+  }
+
+  // COMMENT: BELOW method are [_isValidQRCode, _isWithinAllowedRange, _isReasonValid, _createRequestBody, _processCheckInOutResponse]
+  // Helper Methods
+  String _formattedDate() => DateFormat('dd MMMM yyyy').format(DateTime.now());
+
+  bool _isValidQRCode(String qrCode) =>
+      qrCode.startsWith('usea') && qrCode.length >= 7;
+
+  Future<bool> _isWithinAllowedRange() async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    final distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      _fixedLatitude,
+      _fixedLongitude,
+    );
+    return distance <= _allowedRange;
+  }
+
+  bool _isReasonValid(String reason) {
+    if (reason.trim().isEmpty) {
+      _setError('Reason is required for early check-out.');
+      return false;
+    }
+    return true;
+  }
+
+  Map<String, dynamic> _createRequestBody(String userId, String reason) {
+    final now = tz.TZDateTime.now(_phnomPenh);
+    final time = DateFormat('HH:mm:ss').format(now);
+
+    return {
+      "userId": userId,
+      "reason": reason.isNotEmpty ? reason : "On-time",
+      if (_shiftStatus == 'checkIn') "checkInTime": time,
+      if (_shiftStatus == 'checkOut') "checkOutTime": time,
+    };
+  }
+
+  void _processCheckInOutResponse(dynamic data) {
+    final shiftRecord = data['shiftRecord'];
+
+    if (shiftRecord['firstShift']['checkIn'] == null) {
+      _shiftStatus = 'checkIn';
+    } else if (shiftRecord['firstShift']['checkOut'] == null) {
+      _shiftStatus = 'checkOut';
+    } else if (shiftRecord['secondShift']['checkIn'] == null) {
+      _shiftStatus = 'checkIn';
+    } else if (shiftRecord['secondShift']['checkOut'] == null) {
+      _shiftStatus = 'checkOut';
+    } else {
+      _shiftStatus = 'disabled';
+    }
+    notifyListeners();
+  }
+
+  // COMMENT: When modal should show check-in and check-out reason
+  bool get shouldShowCheckInReason => _isLateForShift();
+  bool get shouldShowCheckOutReason => _isEarlyForShiftEnd();
+
+  // Time and Shift Helpers
+  bool get _isFirstShift => _isWithinShiftTime(7, 5);
+  bool get _isSecondShift => _isWithinShiftTime(14, 3);
+
+  bool _isLateForShift() => _isFirstShift || _isSecondShift;
+  bool _isEarlyForShiftEnd() => _isBeforeShiftEnd(12) || _isBeforeShiftEnd(17);
+
+  bool _isWithinShiftTime(int startHour, int durationHours) {
+    final now = tz.TZDateTime.now(_phnomPenh);
+    final shiftStart = _shiftTime(startHour);
+    return now.isAfter(shiftStart) &&
+        now.isBefore(shiftStart.add(Duration(hours: durationHours)));
+  }
+
+  bool _isBeforeShiftEnd(int endHour) {
+    final now = tz.TZDateTime.now(_phnomPenh);
+    final shiftEnd = _shiftTime(endHour);
+    return now.isBefore(shiftEnd);
+  }
+
+  tz.TZDateTime _shiftTime(int hour) {
+    final now = tz.TZDateTime.now(_phnomPenh);
+    return tz.TZDateTime(_phnomPenh, now.year, now.month, now.day, hour);
+  }
+
+  // COMMENT: loading and error state
+  void _setLoading(bool isLoading) {
+    _isLoading = isLoading;
+    notifyListeners();
+  }
+
+  void _setError(String message) {
+    _errorMessage = message;
+    notifyListeners();
   }
 }
