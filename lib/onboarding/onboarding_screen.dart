@@ -51,7 +51,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 TextButton(
                   onPressed: () => _controller.jumpToPage(2),
-                  child: Text('Skip'.toUpperCase(), style: getSubTitle()),
+                  child: Text('Skip'.toUpperCase(), style: getWhiteSubTitle()),
                 ),
                 SmoothPageIndicator(
                   controller: _controller,

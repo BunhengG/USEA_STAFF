@@ -29,7 +29,7 @@ class _PageThreeState extends State<PageThree> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 10),
               child: Container(
-                color: primaryColor.withOpacity(0.030),
+                color: primaryColor.withOpacity(0.3),
               ),
             ),
           ),
@@ -67,7 +67,7 @@ class _PageThreeState extends State<PageThree> {
                           reverse: true,
                           width: double.infinity,
                         ),
-                        const SizedBox(height: defaultPadding),
+                        const SizedBox(height: defaultPadding * 2),
                         Text(
                           "Let's Get Start!".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(

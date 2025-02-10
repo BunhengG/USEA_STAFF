@@ -38,7 +38,7 @@ class _PageTwoState extends State<PageTwo> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
               child: Container(
-                color: primaryColor.withOpacity(0.050),
+                color: primaryColor.withOpacity(0.3),
               ),
             ),
           ),
@@ -67,7 +67,7 @@ class _PageTwoState extends State<PageTwo> {
                           reverse: true,
                           width: double.infinity,
                         ),
-                        const SizedBox(height: defaultPadding),
+                        const SizedBox(height: defaultPadding * 3),
                         Text(
                           "Check Your Attendance".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(

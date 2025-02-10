@@ -35,26 +35,26 @@ class _SplashScreenState extends State<SplashScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/img/usealogo.png',
+              'assets/img/logo.png',
               fit: BoxFit.cover,
               width: 140,
             ),
-            const Text(
-              'សាកលវិទ្យាល័យ សៅស៍អុីសថ៍អេយសៀ',
-              style: TextStyle(
-                fontSize: titleSize - 2,
-                fontFamily: ft_Kh_Title,
-                color: titlePrimaryColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
             Text(
-              'University of South-East Asia'.toUpperCase(),
+              'Ultimate Check-in'.toUpperCase(),
               style: const TextStyle(
-                fontSize: titleSize - 2,
-                fontFamily: ft_Kh_Title,
+                fontSize: titleSize,
+                fontFamily: ft_Eng,
                 color: titlePrimaryColor,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+            const Text(
+              'Suggests a top-tier solution.',
+              style: TextStyle(
+                fontSize: titleSize - 2,
+                fontFamily: ft_Eng,
+                color: titlePrimaryColor,
+                fontWeight: FontWeight.w500,
               ),
             ),
             Lottie.asset('assets/icon/loading.json', width: 120),

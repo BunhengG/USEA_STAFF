@@ -46,8 +46,8 @@ class LoginScreen extends StatelessWidget {
         ),
       ]),
       child: Image.asset(
-        'assets/img/usea_check.png',
-        scale: 3,
+        'assets/img/logo.png',
+        scale: 4,
         fit: BoxFit.contain,
       ),
     );
@@ -58,7 +58,7 @@ class LoginScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: mdPadding, bottom: defaultPadding),
       child: Text(
-        'Welcome to usea check!'.toUpperCase(),
+        'Welcome to U-check!'.toUpperCase(),
         style: getTitle(),
       ),
     );

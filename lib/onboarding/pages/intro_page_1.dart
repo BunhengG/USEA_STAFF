@@ -38,7 +38,7 @@ class _PageOneState extends State<PageOne> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
               child: Container(
-                color: primaryColor.withOpacity(0.050),
+                color: primaryColor.withOpacity(0.3),
               ),
             ),
           ),
@@ -67,6 +67,7 @@ class _PageOneState extends State<PageOne> {
                           reverse: true,
                           width: double.infinity,
                         ),
+                        const SizedBox(height: defaultPadding),
                         Text(
                           "Welcome to usea check".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(
