@@ -5,7 +5,6 @@ import 'package:usea_staff_test/provider/memeber_provider.dart';
 import 'package:usea_staff_test/provider/mycard_provider.dart';
 import 'package:usea_staff_test/provider/permission_provider.dart';
 import 'package:usea_staff_test/splash_screen.dart';
-// import 'auth/gate/authGate.dart';
 import 'provider/attendance_provider.dart';
 import 'provider/check_in_out_provider.dart';
 import 'provider/profileDetails_provider.dart';
@@ -36,15 +35,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // home: const AuthGate(),
-      home: const SplashScreen(),
-
+    return const MaterialApp(
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
-      title: 'Employee Dashboard',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
     );
   }
 }
