@@ -40,12 +40,14 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 140,
             ),
             Text(
-              'Ultimate Check-in'.toUpperCase(),
+              'Ultimate Check'.toUpperCase(),
               style: const TextStyle(
                 fontSize: titleSize,
                 fontFamily: ft_Eng,
                 color: titlePrimaryColor,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.6,
+                wordSpacing: 5,
               ),
             ),
             const Text(

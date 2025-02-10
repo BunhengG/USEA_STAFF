@@ -69,7 +69,7 @@ class _PageTwoState extends State<PageTwo> {
                         ),
                         const SizedBox(height: defaultPadding * 3),
                         Text(
-                          "Check Your Attendance".toUpperCase(),
+                          "Check-in Your Attendance".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,

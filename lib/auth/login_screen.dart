@@ -58,7 +58,7 @@ class LoginScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: mdPadding, bottom: defaultPadding),
       child: Text(
-        'Welcome to U-check!'.toUpperCase(),
+        'Welcome to Ultimate Check!'.toUpperCase(),
         style: getTitle(),
       ),
     );
