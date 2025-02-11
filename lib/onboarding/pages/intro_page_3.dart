@@ -69,7 +69,7 @@ class _PageThreeState extends State<PageThree> {
                         ),
                         const SizedBox(height: defaultPadding * 2),
                         Text(
-                          "Let's Get Start!".toUpperCase(),
+                          "Let Get Start!".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,

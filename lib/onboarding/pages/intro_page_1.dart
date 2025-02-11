@@ -67,7 +67,7 @@ class _PageOneState extends State<PageOne> {
                           reverse: true,
                           width: double.infinity,
                         ),
-                        const SizedBox(height: defaultPadding * 2),
+                        const SizedBox(height: defaultPadding),
                         Text(
                           "Welcome to The Ultimate Check".toUpperCase(),
                           style: getWhiteSubTitle().copyWith(
